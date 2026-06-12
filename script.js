@@ -1,26 +1,49 @@
 /* --- 1. STARTUP & UTILITIES --- */
 document.addEventListener('DOMContentLoaded', function() {
-  if (typeof updateTrendUI === "function") updateTrendUI();
-  if (typeof updateNetStatus === "function") updateNetStatus();
-  if (typeof initReveal === "function") initReveal();
-  if (typeof initAdminSystem === "function") initAdminSystem();
-
-  // Set Tahun Footer
-  const yearEl = document.getElementById('year');
-  if(yearEl) yearEl.innerText = new Date().getFullYear();
-
-  // Mod Incognito & Statistik Tracker
-  setupIncognito();
-  setupStatsTracker();
-  
-  // Notifikasi
-  setTimeout(() => {
-    const notif = document.getElementById('notifBubble');
-    if(notif) {
-      notif.classList.add('show');
-      setTimeout(() => { notif.classList.remove('show'); }, 5000);
+    
+    // A. LOAD DATA DARI data.js
+    const grid = document.getElementById('blogGrid');
+    if (grid && typeof blogData !== 'undefined') {
+        blogData.forEach(item => {
+            const card = document.createElement('a');
+            card.className = `blog-card ${item.cat} ${item.isPrivate ? 'private' : ''}`;
+            card.href = item.url;
+            card.target = '_blank';
+            
+            card.innerHTML = `
+                <div class='badge-container'><span class='badge-new' style='display: none;'>New</span></div>
+                <h3><span class='status-dot status-online'></span>${item.name}</h3>
+                <p>${item.desc}</p>
+                <span class='last-update' data-time='2026-06-13'></span>
+            `;
+            grid.appendChild(card);
+        });
     }
-  }, 2000);
+
+    // B. FUNGSI SISTEM (Startup)
+    if (typeof updateTrendUI === "function") updateTrendUI();
+    if (typeof updateNetStatus === "function") updateNetStatus();
+    if (typeof initAdminSystem === "function") initAdminSystem();
+
+    // Set Tahun Footer
+    const yearEl = document.getElementById('year');
+    if(yearEl) yearEl.innerText = new Date().getFullYear();
+
+    // Mod Incognito & Statistik Tracker
+    setupIncognito();
+    setupStatsTracker();
+    
+    // C. ANIMASI REVEAL (Dipanggil selepas kad selesai di-load)
+    if (typeof initReveal === "function") initReveal();
+
+    // Notifikasi
+    setTimeout(() => {
+        const notif = document.getElementById('notifBubble');
+        if(notif) {
+            notif.classList.add('show');
+            setTimeout(() => { notif.classList.remove('show'); }, 5000);
+        }
+    }, 2000);
 });
 
 /* --- 2. SEARCH & FILTER --- */
@@ -247,4 +270,14 @@ document.getElementById('btnUnlock').onclick = function() {
 function closeLock() {
   document.getElementById('linkLock').style.display = 'none';
   document.getElementById('lockKey').value = "";
+}
+
+/* --- CONTOH FUNGSI PENDOKONG --- */
+function setupStatsTracker() {
+    setInterval(function() {
+        var a = document.querySelectorAll('.blog-card').length;
+        var u = Array.from(document.querySelectorAll('.badge-new')).filter(function(b){ return b.style.display !== 'none' }).length;
+        if (document.getElementById('vCount')) document.getElementById('vCount').innerText = a;
+        if (document.getElementById('oCount')) document.getElementById('oCount').innerText = u;
+    }, 3000);
 }
