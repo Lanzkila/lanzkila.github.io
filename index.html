@@ -3,309 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manga Converter Studio</title>
-
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'></script>
-    <script src='https://unpkg.com/pdf-lib/dist/pdf-lib.min.js'></script>
-
-    <style>
-body {
-  background-color: #f0f2f5;
-  margin: 0; padding: 20px;
-  display: flex; justify-content: center; align-items: center;
-  min-height: 100vh;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-}
-
-#converter-vault {
-  background: #ffffff;
-  padding: 30px;
-  border-radius: 24px;
-  max-width: 480px;
-  width: 100%;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-  border: 1px solid #e1e8ed;
-}
-
-.title-zone { text-align: center; margin-bottom: 25px; }
-.title-zone h2 { font-weight: 800; margin: 0; color: #1a1d23; font-size: 24px; }
-.title-zone span { color: #0984e3; }
-
-/* Premium Drop Zone */
-.drop-zone {
-  height: 150px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  border-radius: 24px;
-  background: linear-gradient(145deg, #ffffff, #f3f7fa);
-  box-shadow: 10px 10px 20px #e6e9ed, -10px -10px 20px #ffffff;
-  transition: 0.3s; cursor: pointer; margin-bottom: 25px; position: relative; overflow: hidden;
-}
-.drop-zone:active { transform: scale(0.97); }
-.drop-zone::before {
-  content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-  border: 2px dashed #0984e3; border-radius: 24px; margin: 10px; opacity: 0.2;
-}
-
-.icon-circle {
-  width: 55px; height: 55px; background: #fff; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05); z-index: 2; margin-bottom: 10px;
-}
-
-#file-name { font-size: 14px; font-weight: 700; color: #2d3436; z-index: 2; text-align: center; padding: 0 15px; }
-
-/* Control Panel */
-.control-stack { display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px; }
-.control-group { background: #f8f9fa; padding: 15px; border-radius: 15px; border: 1px solid #edf2f7; }
-.control-group label { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: #718096; margin-bottom: 10px; text-transform: uppercase; }
-
-select {
-  width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e0;
-  background: #fff; font-size: 14px; font-weight: 600; appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 10px center; background-size: 16px;
-}
-
-input[type="range"] { -webkit-appearance: none; width: 100%; height: 6px; background: #e2e8f0; border-radius: 5px; outline: none; }
-input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: #0984e3; border-radius: 50%; cursor: pointer; }
-
-/* Progress Area */
-.status-area { margin-bottom: 20px; }
-.progress-bg { width: 100%; height: 10px; background: #edf2f7; border-radius: 10px; overflow: hidden; margin-top: 8px; border: 1px solid #e2e8f0; }
-#progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #0984e3, #00d2ff); transition: 0.2s; }
-
-/* Dual Buttons */
-.button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
-.btn-exec {
-  padding: 16px; border: none; border-radius: 14px; font-weight: 700; font-size: 14px;
-  cursor: pointer; color: white; transition: 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-.btn-exec:active { transform: scale(0.95); }
-.btn-exec:disabled { background: #cbd5e0 !important; cursor: not-allowed; box-shadow: none; }
-
-.btn-pdf { background: #1e272e; }
-.btn-cbz { background: #0984e3; }
-
-.footer-note { font-size: 10px; color: #a0aec0; text-align: center; margin-top: 25px; line-height: 1.6; }
-    </style>
+    <title>Nimegun - Kirin Engine</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-theme='light'>
 
-<div id='converter-vault'>
-  <div class='title-zone'>
-    <h2>MANGA <span>STUDIO</span></h2>
-    <p style='font-size:12px; color:#718096; margin-top:5px;'>Hybrid: PDF Merge, Images, ZIP &amp; CBZ</p>
-  </div>
-
-  <div class='drop-zone' id='drop-area' onclick='document.getElementById(&quot;file-input&quot;).click()'>
-    <div class='icon-circle'>
-      <svg height='26' viewBox='0 0 24 24' width='26' xmlns='http://www.w3.org/2000/svg'><path d='M12 11V3m0 0l-4 4m4-4l4 4' fill='none' stroke='#0984e3' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5'/><path d='M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4' fill='none' stroke='#0984e3' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5'/></svg>
+    <div class='progress-container'>
+        <div class='progress-bar' id='myBar'></div>
     </div>
-    <p id='file-name'>Drop ZIP, CBZ, PDFs, or Images</p>
-    <input accept='.cbz, .zip, .pdf, image/*' id='file-input' multiple='multiple' style='display:none;' type='file'/>
-  </div>
+    
+    <div id='notifBubble'>🔔 Nimegun Live Berjaya Dimuatkan!</div>
 
-  <div class='control-stack'>
-    <div class='control-group'>
-      <label><span>MAX RESOLUTION (PDF ONLY)</span> <span id='reso-val' style='color:#0984e3'>Auto</span></label>
-      <select id='width-select' onchange='document.getElementById(&quot;reso-val&quot;).innerText = this.options[this.selectedIndex].text'>
-        <option value='original'>Auto (Original)</option>
-        <option value='2000'>2000px (Ultra)</option>
-        <option value='1600'>1600px (FHD)</option>
-        <option value='1200'>1200px (HD)</option>
-        <option value='800'>800px (Mobile)</option>
-      </select>
+    <header>
+        <span class='admin-welcome' id='greetText'>Sistem Dimuatkan...</span>
+        <h1>Nimegun</h1>
+        <div class='battery-meter'><div id='batLevel'></div></div>
+        <div class='stats-bar'>📁 Total Repo: <span id='vCount'>0</span> | 🔥 Update Baru: <span id='oCount'>0</span></div>
+        <div class='net-status'>
+            <div class='dot-net' id='netDot'></div> <span id='netText'>Online</span>
+        </div>
+    </header>
+  
+    <div class='hub-divider'><span>Menu</span></div>
+
+    <nav class='controls'>
+        <input id='searchBar' onkeyup='searchFunction()' placeholder='Cari nama repo...' type='text'/>
+        <div id='trendingBox' onclick='quickSearch()'>Trending: <b id='trendWord'>...</b></div>
+        <div class='sort-group'>
+            <button class='sort-btn' onclick='sortGrid("name")'>🔠 Nama</button>
+            <button class='sort-btn' onclick='sortGrid("update")'>🔥 Terkini</button>
+        </div>
+        <div class='filter-group'>
+            <button class='filter-btn active' onclick='filterBlog("all")'>Semua</button>
+            <button class='filter-btn' onclick='filterBlog("cat1")'>Personal/Anime</button>
+            <button class='filter-btn' onclick='filterBlog("cat2")'>Radio/TV</button>
+            <button class='filter-btn' onclick='filterBlog("cat3")'>Safelink</button>
+            <button class='filter-btn' onclick='filterBlog("cat4")'>Tools</button>
+        </div>
+    </nav>
+
+    <div class='container'>
+        <div class='grid-container' id='blogGrid'>
+            </div>
     </div>
-    <div class='control-group'>
-      <label><span>QUALITY (PDF ONLY)</span> <span style='color:#0984e3'><span id='q-val'>80</span>%</span></label>
-      <input id='quality-range' max='100' min='10' oninput='document.getElementById(&quot;q-val&quot;).innerText=this.value' type='range' value='80'/>
+  
+    <div class='fab-container'>
+        <button class='fab-main' id='fabBtn' onclick='toggleFab()'>+</button>
+        <div class='fab-menu' id='fabMenu'>
+            <div class='menu-item' onclick='toggleTheme()'>🌓 Tukar Tema</div>
+            <div class='menu-item' onclick='scrollToTop()'>🚀 Ke Atas</div>
+            <div class='menu-item menu-surprise' onclick='randomBlog()'>🎲 Surprise Repo!</div>
+        </div>
     </div>
-  </div>
 
-  <div class='status-area'>
-    <div style='display:flex; justify-content:space-between; font-size:11px; font-weight:800; color:#4a5568;'>
-      <span id='status-text' style='text-transform: uppercase;'>READY</span>
-      <span id='percentage'>0%</span>
+    <div class='hub-divider'><span>Tamat Halaman</span></div>
+  
+    <footer>
+        <div class='inner-box'>
+            &#169; <span id='year'></span> LanzMagick | All Right Reserved. - Created By Kirin
+        </div>
+    </footer>
+  
+    <div id='customMenu'>
+        <div class='menu-opt' onclick='openCurrent()'>🌍 Buka Repo</div>
+        <div class='menu-opt' onclick='copyCurrent()'>📋 Salin Pautan</div>
     </div>
-    <div class='progress-bg'><div id='progress-fill'/></div>
-  </div>
+  
+    <div id='linkLock'>
+        <h3>🔒 PAUTAN DIKUNCI</h3>
+        <p style='font-size:11px; color:var(--sub); margin:0;'>Sila masukkan kunci akses v13.</p>
+        <input id='lockKey' placeholder='••••••' type='password'/>
+        <div class='lock-btns'>
+            <button id='btnUnlock' type='button'>BUKA SEKARANG</button>
+            <button class='btn-cancel' onclick='closeLock()' type='button'>BATAL AKSES</button>
+        </div>
+    </div>
 
-  <div class='button-grid'>
-    <button class='btn-exec btn-pdf' id='pdf-btn'>CONVERT</button>
-    <button class='btn-exec btn-cbz' id='cbz-btn'>REVERSE</button>
-  </div>
-
-<div class='footer-note'>
-    <strong>Multi-Support:</strong> ZIP/CBZ to PDF, Multiple Images to PDF, or Multiple PDF Merge.<br>
-    &copy; <span id="current-year"></span> Manga Studio.
-</div>
-</div>
-
-    <script>
-const fileInput = document.getElementById('file-input');
-const statusText = document.getElementById('status-text');
-const progressFill = document.getElementById('progress-fill');
-const percentageText = document.getElementById('percentage');
-const allBtns = document.querySelectorAll('.btn-exec');
-
-function disableBtns(state) { allBtns.forEach(b => b.disabled = state); }
-
-function updateProgress(current, total, msg) {
-    const percent = Math.round((current / total) * 100);
-    progressFill.style.width = percent + '%';
-    percentageText.innerText = percent + '%';
-    statusText.innerText = `${msg}: ${current}/${total}`;
-}
-
-document.getElementById('pdf-btn').onclick = async function() {
-    const files = fileInput.files;
-    if (files.length === 0) return alert("Pilih fail dulu!");
-    disableBtns(true);
-
-    try {
-        const firstFile = files[0];
-        
-        if (firstFile.type === "application/pdf" || firstFile.name.toLowerCase().endsWith('.pdf')) {
-            statusText.innerText = "MERGING PDFS...";
-            const mergedPdf = await PDFLib.PDFDocument.create();
-            for (let i = 0; i < files.length; i++) {
-                updateProgress(i + 1, files.length, "Merging");
-                const pdfBytes = await files[i].arrayBuffer();
-                const pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
-                const copiedPages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
-                copiedPages.forEach((page) => mergedPdf.addPage(page));
-            }
-            const mergedPdfBytes = await mergedPdf.save();
-            downloadBlob(new Blob([mergedPdfBytes]), "Merged_MangaStudio.pdf");
-            statusText.innerText = "MERGE COMPLETED!";
-        } 
-        
-        else if (firstFile.name.match(/\.(zip|cbz)$/i)) {
-            const zip = await JSZip.loadAsync(firstFile);
-            const images = Object.keys(zip.files).filter(name => name.match(/\.(jpg|jpeg|png|webp)$/i) && !name.includes('__MACOSX')).sort((a, b) => a.localeCompare(b, undefined, {numeric: true}));
-            await createPdfFromImages(images, zip, firstFile.name.replace(/\.[^/.]+$/, ""));
-        }
-       
-        else {
-            const imagesData = Array.from(files).filter(f => f.type.startsWith('image/')).sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
-            await createPdfFromRawImages(imagesData, "Converted_Images");
-        }
-    } catch (e) { 
-        console.error(e);
-        alert("Ralat PDF! Pastikan fail betul."); 
-    }
-    disableBtns(false);
-};
-
-async function createPdfFromImages(imageNames, zip, outputName) {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ unit: 'px', compress: true });
-
-    for (let i = 0; i < imageNames.length; i++) {
-        updateProgress(i + 1, imageNames.length, "Rendering PDF");
-        const blob = await zip.files[imageNames[i]].async("blob");
-        const url = URL.createObjectURL(blob);
-        const img = await loadImage(url);
-        const processedData = processImage(img, document.getElementById('width-select').value, document.getElementById('quality-range').value);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const imgProps = pdf.getImageProperties(processedData);
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-        if (i > 0) pdf.addPage([pdfWidth, pdfHeight]);
-        else pdf.setPage(1); // Ensure first page size is correct
-        pdf.addImage(processedData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
-        URL.revokeObjectURL(url);
-    }
-    pdf.save(outputName + ".pdf");
-    statusText.innerText = "PDF COMPLETED!";
-}
-
-async function createPdfFromRawImages(fileList, outputName) {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ unit: 'px', compress: true });
-
-    for (let i = 0; i < fileList.length; i++) {
-        updateProgress(i + 1, fileList.length, "Processing Images");
-        const url = URL.createObjectURL(fileList[i]);
-        const img = await loadImage(url);
-        const processedData = processImage(img, document.getElementById('width-select').value, document.getElementById('quality-range').value);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const imgProps = pdf.getImageProperties(processedData);
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-        if (i > 0) pdf.addPage([pdfWidth, pdfHeight]);
-        pdf.addImage(processedData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
-        URL.revokeObjectURL(url);
-    }
-    pdf.save(outputName + ".pdf");
-    statusText.innerText = "IMAGE TO PDF DONE!";
-}
-
-document.getElementById('cbz-btn').onclick = async function() {
-    const files = fileInput.files;
-    if (files.length === 0) return alert("Pilih fail dulu!");
-    disableBtns(true);
-
-    try {
-        const newZip = new JSZip();
-        if (files[0].name.match(/\.(zip|cbz)$/i)) {
-            const zip = await JSZip.loadAsync(files[0]);
-            const images = Object.keys(zip.files).filter(name => name.match(/\.(jpg|jpeg|png|webp)$/i) && !name.includes('__MACOSX'));
-            for (let i = 0; i < images.length; i++) {
-                updateProgress(i + 1, images.length, "Packing CBZ");
-                const imgData = await zip.files[images[i]].async("uint8array");
-                newZip.file(images[i].split('/').pop(), imgData);
-            }
-        } else {
-            // Repack raw images to CBZ
-            const images = Array.from(files).filter(f => f.type.startsWith('image/'));
-            for (let i = 0; i < images.length; i++) {
-                updateProgress(i + 1, images.length, "Packing CBZ");
-                const imgData = await images[i].arrayBuffer();
-                newZip.file(images[i].name, imgData);
-            }
-        }
-
-        const content = await newZip.generateAsync({type: "blob"});
-        downloadBlob(content, (files[0].name.split('.')[0] || "Manga") + ".cbz");
-        statusText.innerText = "CBZ COMPLETED!";
-    } catch (e) { alert("CBZ Error!"); }
-    disableBtns(false);
-};
-
-function processImage(img, targetWidth, quality) {
-    const canvas = document.createElement('canvas');
-    let w = img.width, h = img.height;
-    if (targetWidth !== 'original' && w > parseInt(targetWidth)) {
-        const ratio = parseInt(targetWidth) / w;
-        w = parseInt(targetWidth); h = h * ratio;
-    }
-    canvas.width = w; canvas.height = h;
-    const ctx = canvas.getContext('2d');
-    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(img, 0, 0, w, h);
-    return canvas.toDataURL('image/jpeg', quality / 100);
-}
-
-function loadImage(url) { return new Promise(res => { const i = new Image(); i.onload = () => res(i); i.src = url; }); }
-
-function downloadBlob(blob, name) {
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = name;
-    link.click();
-}
-
-fileInput.onchange = (e) => { 
-    if(e.target.files.length > 0) {
-        const count = e.target.files.length;
-        document.getElementById('file-name').innerText = count > 1 ? `${count} Files Selected` : e.target.files[0].name;
-    }
-};
-        document.getElementById("current-year").innerText = new Date().getFullYear();
-    </script>
-
+    <script src="script.js"></script>
 </body>
 </html>
