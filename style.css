@@ -94,17 +94,3 @@ footer .inner-box:hover { border-color: var(--accent); box-shadow: 0 0 15px rgba
 #linkLock button { width: 100%; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer; border: none; font-size: 14px; text-transform: uppercase; transition: 0.3s; }
 #btnUnlock { background: var(--accent); color: white; }
 .btn-cancel { background: var(--sub); color: white; opacity: 0.7; }
-/* --- CSS Khas untuk Butang Tetapan Kunci / Login dalam FAB Menu --- */
-.fab-menu .menu-item:first-child {
-  background: linear-gradient(135deg, #6366f1, #4f46e5);
-  color: white;
-  font-weight: 700;
-  border: none;
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-  transition: all 0.3s ease;
-}
-
-.fab-menu .menu-item:first-child:hover {
-  background: linear-gradient(135deg, #4f46e5, #4338ca);
-  transform: translateX(-3px);
-}
