@@ -10,8 +10,11 @@ document.addEventListener('DOMContentLoaded', function() {
             card.href = item.url;
             card.target = '_blank';
             
+            // Semak status new (mengikut properti isNew dari data.js)
+            const displayNew = item.isNew ? 'inline-block' : 'none';
+            
             card.innerHTML = `
-                <div class='badge-container'><span class='badge-new' style='display: none;'>New</span></div>
+                <div class='badge-container'><span class='badge-new' style='display: ${displayNew};'>New</span></div>
                 <h3><span class='status-dot status-online'></span>${item.name}</h3>
                 <p>${item.desc}</p>
                 <span class='last-update' data-time='2026-06-13'></span>
@@ -33,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupIncognito();
     setupStatsTracker();
     
-    // C. ANIMASI REVEAL (Dipanggil selepas kad selesai di-load)
+    // C. ANIMASI REVEAL
     if (typeof initReveal === "function") initReveal();
 
     // Notifikasi
@@ -120,12 +123,10 @@ function setupStatsTracker() {
   }, 3000);
 }
 
-document.querySelectorAll('.blog-card').forEach(card => {
-  card.addEventListener('click', () => {
+document.addEventListener('click', function(e) {
+  const card = e.target.closest('.blog-card');
+  if(card) {
     localStorage.setItem(card.href, 'visited');
-    card.classList.add('visited');
-  });
-  if(localStorage.getItem(card.href) === 'visited') {
     card.classList.add('visited');
   }
 });
@@ -163,7 +164,7 @@ function quickSearch() {
   }
 }
 
-/* --- 6. ADVANCED SYSTEM (INCIGNITO, CONTEXT, LOCK) --- */
+/* --- 6. ADVANCED SYSTEM --- */
 function setupIncognito() {
   let pressTimer;
   const headerTitle = document.querySelector('header h1');
@@ -256,28 +257,21 @@ document.addEventListener('click', function(e) {
   }
 });
 
-document.getElementById('btnUnlock').onclick = function() {
-  var val = document.getElementById('lockKey').value;
-  if (val === masterPass) {
-    window.open(pendingUrl, '_blank');
-    closeLock();
-  } else {
-    alert("Kunci Salah Bah!");
-    document.getElementById('lockKey').value = "";
-  }
-};
+const btnUnlock = document.getElementById('btnUnlock');
+if(btnUnlock) {
+  btnUnlock.onclick = function() {
+    var val = document.getElementById('lockKey').value;
+    if (val === masterPass) {
+      window.open(pendingUrl, '_blank');
+      closeLock();
+    } else {
+      alert("Kunci Salah Bah!");
+      document.getElementById('lockKey').value = "";
+    }
+  };
+}
 
 function closeLock() {
   document.getElementById('linkLock').style.display = 'none';
   document.getElementById('lockKey').value = "";
-}
-
-/* --- CONTOH FUNGSI PENDOKONG --- */
-function setupStatsTracker() {
-    setInterval(function() {
-        var a = document.querySelectorAll('.blog-card').length;
-        var u = Array.from(document.querySelectorAll('.badge-new')).filter(function(b){ return b.style.display !== 'none' }).length;
-        if (document.getElementById('vCount')) document.getElementById('vCount').innerText = a;
-        if (document.getElementById('oCount')) document.getElementById('oCount').innerText = u;
-    }, 3000);
 }
