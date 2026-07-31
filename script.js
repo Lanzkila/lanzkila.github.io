@@ -243,9 +243,28 @@ function initReveal() {
   document.querySelectorAll('.blog-card').forEach(card => observer.observe(card));
 }
 
-/* --- LOCK LOGIC --- */
+/* --- LOCK LOGIC (Dual: Dynamic Generated Key + SHA-256 Hash Storage) --- */
 var pendingUrl = "";
-var masterPass = "1234"; 
+// Tentukan password default anda di sini (cth: "LanzKey99")
+var defaultMasterKey = "LanzKey99"; 
+
+// Fungsi untuk pastikan kunci/hash sentiasa wujud dalam localStorage
+async function getActiveMasterHash() {
+  let savedHash = localStorage.getItem('site_master_hash');
+  
+  if (!savedHash) {
+    // Jika tiada (atau lepas clear cache), auto-generate hash daripada defaultMasterKey
+    const encoder = new TextEncoder();
+    const data = encoder.encode(defaultMasterKey);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    savedHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    
+    // Simpan hash tersebut ke dalam localStorage
+    localStorage.setItem('site_master_hash', savedHash);
+  }
+  return savedHash;
+}
 
 document.addEventListener('click', function(e) {
   var card = e.target.closest('.blog-card');
@@ -259,9 +278,21 @@ document.addEventListener('click', function(e) {
 
 const btnUnlock = document.getElementById('btnUnlock');
 if(btnUnlock) {
-  btnUnlock.onclick = function() {
-    var val = document.getElementById('lockKey').value;
-    if (val === masterPass) {
+  btnUnlock.onclick = async function() {
+    var userInput = document.getElementById('lockKey').value;
+    
+    // Tukar input pengguna kepada SHA-256 secara langsung
+    const encoder = new TextEncoder();
+    const data = encoder.encode(userInput);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    var userInputHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+    // Ambil hash yang aktif daripada localStorage (auto-generate baharu jika cache clear)
+    var activeHash = await getActiveMasterHash();
+
+    // Semak sama ada hash input sepadan dengan hash tersimpan
+    if (userInputHash === activeHash) {
       window.open(pendingUrl, '_blank');
       closeLock();
     } else {
