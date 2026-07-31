@@ -306,3 +306,17 @@ function closeLock() {
   document.getElementById('linkLock').style.display = 'none';
   document.getElementById('lockKey').value = "";
 }
+
+/* --- MANUAL TRIGGER UNTUK LOCK POPUP --- */
+function openLockModal() {
+  pendingUrl = ""; // Kosongkan URL sebab ini buka secara manual (bukan klik kad private)
+  updateLockUI();  // Kemaskini sama ada mod Register atau Login
+  const lockModal = document.getElementById('linkLock');
+  if(lockModal) {
+    lockModal.style.display = 'block';
+    setTimeout(function() { 
+      const lockKey = document.getElementById('lockKey');
+      if(lockKey) lockKey.focus(); 
+    }, 100);
+  }
+}
