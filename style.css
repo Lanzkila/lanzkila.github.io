@@ -837,3 +837,51 @@ a { color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
 }
+
+
+/* v19.1 toolbar cleanup ---------------------------------------------------- */
+.trend-chip {
+  max-width: 210px;
+  min-width: 0;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.trend-chip .trend-icon {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+}
+.trend-chip strong {
+  min-width: 0;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.trend-chip strong:not([hidden])::before {
+  content: "·";
+  margin-right: 5px;
+  color: var(--muted);
+}
+.icon-button svg {
+  width: 17px;
+  height: 17px;
+  display: block;
+}
+#viewToggleBtn {
+  flex: 0 0 32px;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 0;
+}
+/* Feed state is no longer part of the visual UI. */
+.feed-state,
+.feed-filter-bar,
+#feedFilterBar {
+  display: none !important;
+}
+@media (max-width: 700px) {
+  .trend-chip strong { display: none !important; }
+  .trend-chip { max-width: none; }
+}

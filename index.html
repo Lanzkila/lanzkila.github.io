@@ -104,14 +104,24 @@
           <h2 id="projectsTitle">Projects</h2>
         </div>
         <div class="project-tools">
-          <div id="trendingBox" class="trend-chip" onclick="quickSearch()" title="Klik untuk cari trend">
-            Trending <strong id="trendWord">...</strong>
-          </div>
+          <button id="trendingBox" class="trend-chip" type="button" onclick="quickSearch()" title="Belum ada carian trending">
+            <svg class="trend-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 16.5 9 11.5l3.5 3.5L20 7.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M15.5 7.5H20V12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Trending</span>
+            <strong id="trendWord" hidden></strong>
+          </button>
           <div class="sort-group" aria-label="Sort projects">
             <button class="sort-btn" type="button" onclick='sortGrid("name")'>Name</button>
             <button class="sort-btn" type="button" onclick='sortGrid("update")'>Latest</button>
           </div>
-          <button class="icon-button" id="viewToggleBtn" type="button" onclick="v17ToggleView()" title="Tukar paparan">☷</button>
+          <button class="icon-button" id="viewToggleBtn" type="button" onclick="v17ToggleView()" title="Tukar ke List View" aria-label="Tukar ke List View">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 6h12M8 12h12M8 18h12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M4 6h.01M4 12h.01M4 18h.01" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+          </button>
           <button class="icon-button" type="button" onclick="randomBlog()" title="Random project">↗</button>
         </div>
       </div>

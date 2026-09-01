@@ -8,7 +8,7 @@ Direktori projek peribadi untuk GitHub Pages. Versi ini menggunakan UI baru yang
 
 - `index.html` — struktur halaman dan layout utama.
 - `style.css` — keseluruhan visual/responsive baharu.
-- `script.js` — search, filter, sort, favourite, feed status, tracking, backup/restore dan fungsi UI.
+- `script.js` — search, filter, sort, favourite, background update tracking, backup/restore dan fungsi UI.
 - `data.js` — **sumber data projek. Edit fail ini untuk tambah atau ubah projek.**
 
 ## Edit projek melalui `data.js`
@@ -47,7 +47,7 @@ const blogData = [
 - Filter kategori + filter New.
 - Sort Name / Latest / Added / Oldest.
 - Favourite / pin projek.
-- Feed/update state dan changelog tracker sedia ada.
+- Background update tracking + changelog tracker sedia ada; label/status Feed tidak lagi dipaparkan.
 - Recently Opened.
 - Grid/List view.
 - Light/Dark appearance.
@@ -65,6 +65,14 @@ const blogData = [
 - Kurang gradient, glow, pill berlebihan dan dekorasi tema lama.
 - Stylesheet lama dibuang dan diganti sepenuhnya, bukan sekadar override tambahan.
 - Mobile menggunakan satu kolum dan action bar yang tidak bertindih.
+
+## v19.1 toolbar cleanup
+
+- Trending tidak lagi memaparkan placeholder `...`; bila tiada sejarah carian, ia kekal sebagai butang Trending yang bersih.
+- Jika ada trend, istilah carian dipaparkan secara kemas dan dipendekkan jika terlalu panjang.
+- Grid/List sekarang menggunakan ikon SVG sahaja tanpa teks.
+- Status `Feed: OK / Gagal / Semak` dan bar filter Feed dibuang dari UI. Logic semakan update di belakang tabir masih dikekalkan untuk badge/changelog.
+- `data.js` tidak disentuh dan tidak termasuk dalam patch.
 
 ## Deploy ke GitHub Pages
 

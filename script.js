@@ -527,17 +527,32 @@ function recordSearch(val) {
 }
 
 function updateTrendUI() {
-  const topSearch = Object.keys(searchHistory).reduce((a, b) => searchHistory[a] > searchHistory[b] ? a : b, "...");
   const trendWord = document.getElementById('trendWord');
-  if(trendWord) trendWord.innerText = topSearch;
+  const trendBox = document.getElementById('trendingBox');
+  const keys = Object.keys(searchHistory || {}).filter(key => key && Number(searchHistory[key]) > 0);
+  const topSearch = keys.length
+    ? keys.reduce((a, b) => Number(searchHistory[a]) >= Number(searchHistory[b]) ? a : b)
+    : '';
+
+  if (trendWord) {
+    trendWord.textContent = topSearch;
+    trendWord.hidden = !topSearch;
+  }
+  if (trendBox) {
+    trendBox.classList.toggle('has-trend', !!topSearch);
+    trendBox.title = topSearch ? ('Cari trending: ' + topSearch) : 'Belum ada carian trending';
+    trendBox.setAttribute('aria-label', topSearch ? ('Cari trending ' + topSearch) : 'Trending');
+  }
 }
 
 function quickSearch() {
-  const word = document.getElementById('trendWord').innerText;
-  if(word !== "...") {
-    document.getElementById('searchBar').value = word;
-    searchFunction();
-  }
+  const trendWord = document.getElementById('trendWord');
+  const word = trendWord ? trendWord.textContent.trim() : '';
+  if (!word) return;
+  const search = document.getElementById('searchBar');
+  if (!search) return;
+  search.value = word;
+  searchFunction();
 }
 
 /* 3. AUTO-SORT ENGINE */
@@ -743,13 +758,11 @@ function v17GetFavorites() {
 }
 
 function v17SetFeedState(card, state, text) {
-  const meta = ensureCardMeta(card);
-  meta.feedState.classList.remove('checking', 'ok', 'error');
-  meta.feedState.classList.add(state || 'checking');
-  meta.feedText.textContent = text || (state === 'ok' ? 'Feed: OK' : state === 'error' ? 'Feed: Gagal' : 'Feed: Semak');
+  // Feed checking is kept only as background update-tracking logic.
+  // Its status is intentionally not rendered in the interface.
+  if (!card) return;
+  card.setAttribute('data-feed-state', state || 'checking');
   if (typeof v172UpdateHeaderDashboard === 'function') v172UpdateHeaderDashboard();
-  if (typeof v175UpdateFeedFilterCounts === 'function') v175UpdateFeedFilterCounts();
-  if (typeof v175FeedFilter !== 'undefined' && v175FeedFilter !== 'all' && typeof v17ApplyFilters === 'function') v17ApplyFilters();
 }
 
 function v17AddChangeLog(url, type, text, time, uniqueId) {
@@ -871,11 +884,12 @@ function ensureCardMeta(card) {
   if (!metaLine) {
     metaLine = document.createElement('div');
     metaLine.className = 'card-meta-line';
-    metaLine.innerHTML = "<span class='feed-state checking'><span class='feed-state-dot'></span><span class='feed-state-text'>Feed: Semak</span></span><span class='card-category-label'></span>";
+    metaLine.innerHTML = "<span class='card-category-label'></span>";
     card.appendChild(metaLine);
+  } else {
+    const oldFeedState = metaLine.querySelector('.feed-state');
+    if (oldFeedState) oldFeedState.remove();
   }
-  const feedState = metaLine.querySelector('.feed-state');
-  const feedText = metaLine.querySelector('.feed-state-text');
   const categoryLabel = metaLine.querySelector('.card-category-label');
   if (categoryLabel && !categoryLabel.textContent) {
     categoryLabel.textContent = card.classList.contains('cat1') ? 'Personal / Anime'
@@ -907,7 +921,7 @@ function ensureCardMeta(card) {
   pin.classList.toggle('pinned', pinned);
   card.classList.toggle('is-pinned', pinned);
 
-  return { bNew, bAdded, bType, lastUpdate, countdown, pin, feedState, feedText, metaLine };
+  return { bNew, bAdded, bType, lastUpdate, countdown, pin, feedState: null, feedText: null, metaLine };
 }
 
 function v17ToggleFavourite(card) {
@@ -1329,8 +1343,7 @@ function v17ApplyFilters() {
 
     let feedOK = true;
     if (typeof v175FeedFilter !== 'undefined' && v175FeedFilter !== 'all') {
-      const feed = card.querySelector('.feed-state');
-      feedOK = !!(feed && feed.classList.contains(v175FeedFilter));
+      feedOK = card.getAttribute('data-feed-state') === v175FeedFilter;
     }
 
     card.classList.toggle('hidden', !filterOK || !feedOK);
@@ -1437,8 +1450,12 @@ function v17UpdateViewButton() {
   const btn = document.getElementById('viewToggleBtn');
   if (!grid || !btn) return;
   const list = grid.classList.contains('list-view');
-  btn.innerHTML = list ? '▦ Grid' : '☷ List';
-  btn.title = list ? 'Tukar ke Grid View' : 'Tukar ke List View';
+  const gridIcon = "<svg viewBox='0 0 24 24' aria-hidden='true'><rect x='4' y='4' width='6' height='6' rx='1' fill='none' stroke='currentColor' stroke-width='2'/><rect x='14' y='4' width='6' height='6' rx='1' fill='none' stroke='currentColor' stroke-width='2'/><rect x='4' y='14' width='6' height='6' rx='1' fill='none' stroke='currentColor' stroke-width='2'/><rect x='14' y='14' width='6' height='6' rx='1' fill='none' stroke='currentColor' stroke-width='2'/></svg>";
+  const listIcon = "<svg viewBox='0 0 24 24' aria-hidden='true'><path d='M8 6h12M8 12h12M8 18h12' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'/><path d='M4 6h.01M4 12h.01M4 18h.01' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round'/></svg>";
+  const label = list ? 'Tukar ke Grid View' : 'Tukar ke List View';
+  btn.innerHTML = list ? gridIcon : listIcon;
+  btn.title = label;
+  btn.setAttribute('aria-label', label);
 }
 
 function v17OpenChangeLog(card, filterType) {
@@ -1553,19 +1570,8 @@ function v17SetupUI() {
     group.appendChild(newBtn);
   }
 
-  const categoryMenu = document.querySelector('.category-menu');
-  if (categoryMenu && !document.getElementById('feedFilterBar')) {
-    const feedBar = document.createElement('div');
-    feedBar.id = 'feedFilterBar';
-    feedBar.className = 'feed-filter-bar';
-    feedBar.innerHTML = ""
-      + "<span class='feed-filter-label'>Status Feed</span>"
-      + "<button class='feed-filter-btn active' type='button' data-feed-filter='all' onclick='v175SetFeedFilter(&quot;all&quot;, this)'>Semua <span class='feed-filter-count'>0</span></button>"
-      + "<button class='feed-filter-btn' type='button' data-feed-filter='ok' onclick='v175SetFeedFilter(&quot;ok&quot;, this)'>🟢 OK <span class='feed-filter-count'>0</span></button>"
-      + "<button class='feed-filter-btn' type='button' data-feed-filter='error' onclick='v175SetFeedFilter(&quot;error&quot;, this)'>🔴 Gagal <span class='feed-filter-count'>0</span></button>"
-      + "<button class='feed-filter-btn' type='button' data-feed-filter='checking' onclick='v175SetFeedFilter(&quot;checking&quot;, this)'>🟡 Semak <span class='feed-filter-count'>0</span></button>";
-    categoryMenu.insertAdjacentElement('afterend', feedBar);
-  }
+  // Feed status/filter UI removed. Background update tracking stays active.
+
 
   const container = document.querySelector('.container');
   const grid = document.getElementById('blogGrid');
@@ -1655,10 +1661,9 @@ function v172UpdateHeaderDashboard() {
   let ok = 0;
   let checking = 0;
   cards.forEach(card => {
-    const state = card.querySelector('.feed-state');
-    if (!state) return;
-    if (state.classList.contains('ok')) ok++;
-    else if (state.classList.contains('checking')) checking++;
+    const state = card.getAttribute('data-feed-state');
+    if (state === 'ok') ok++;
+    else if (state === 'checking') checking++;
   });
 
   const okEl = document.getElementById('headerFeedOkCount');
@@ -1838,10 +1843,9 @@ function v175UpdateFeedFilterCounts() {
   const counts = { all: cards.length, ok: 0, error: 0, checking: 0 };
 
   cards.forEach(function(card) {
-    const feed = card.querySelector('.feed-state');
-    if (!feed) return;
-    if (feed.classList.contains('ok')) counts.ok++;
-    else if (feed.classList.contains('error')) counts.error++;
+    const feed = card.getAttribute('data-feed-state');
+    if (feed === 'ok') counts.ok++;
+    else if (feed === 'error') counts.error++;
     else counts.checking++;
   });
 
