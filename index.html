@@ -1,280 +1,181 @@
 <!DOCTYPE html>
 <html lang="ms">
- <head>
+<head>
   <meta charset="utf-8">
-  <title>
-   Nimegun · Projects
-  </title>
-  <meta content="width=device-width, initial-scale=1" name="viewport">
-  <meta name="theme-color" content="#f6f8fa">
-  <link href="style.css" rel="stylesheet">
- </head>
- <body data-theme="light">
-  <div class="progress-container">
-   <div class="progress-bar" id="myBar">
-   </div>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f7f8">
+  <meta name="description" content="Lanzkila Hub — direktori projek dan repositori peribadi.">
+  <title>Lanzkila Hub</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="light">
+  <div class="progress-container" aria-hidden="true">
+    <div class="progress-bar" id="myBar"></div>
   </div>
-  <div id="notifBubble">
-   🔔 Nimegun Live Berjaya Dimuatkan!
-  </div>
-  <header class="dashboard-header">
-   <div class="dashboard-shell">
-    <div class="dashboard-top">
-     <div class="dashboard-brand">
-      <h1>
-       Nimegun
-      </h1>
-      <span class="admin-welcome" id="greetText">
-       Sistem Dimuatkan...
-      </span>
-     </div>
-     <div aria-label="Tindakan pantas" class="header-actions">
-      <button class="header-action" onclick="toggleTheme()" title="Tukar tema" type="button">
-       🌓
-      </button>
-      <button class="header-action" onclick="randomBlog()" title="Surprise Blog" type="button">
-       🎲
-      </button>
-      <button class="header-action" id="refreshFeedBtn" onclick="v17RefreshFeeds()" title="Semak update sekarang" type="button">
-       <span class="refresh-icon">
-        &orarr;
-       </span>
-      </button>
-      <button class="header-action header-view-btn" id="viewToggleBtn" onclick="v17ToggleView()" title="Tukar paparan" type="button">
-       ☷ List
-      </button>
-      <button class="header-action" onclick="v175ExportSettings()" title="Backup settings" type="button">
-       💾
-      </button>
-      <button class="header-action" onclick="v175ChooseImport()" title="Restore settings" type="button">
-       &mapstoup;
-      </button>
-     </div>
-    </div>
-    <div class="dashboard-stats">
-     <div class="dash-stat">
-      <span class="dash-stat-icon">
-       📁
-      </span>
-      <span>
-       Total
-      </span>
-      <b id="vCount">
-       0
-      </b>
-     </div>
-     <button class="dash-stat dash-stat-button" onclick="v172OpenNewFilter()" title="Tunjuk semua blog yang masih New" type="button">
-      <span class="dash-stat-icon">
-       🔥
-      </span>
-      <span>
-       Update
-      </span>
-      <b id="oCount">
-       0
-      </b>
-     </button>
-     <div class="dash-stat">
-      <span class="dash-stat-icon">
-       🆕
-      </span>
-      <span>
-       Added
-      </span>
-      <b id="aCount">
-       0
-      </b>
-     </div>
-     <div class="dash-stat dash-status">
-      <span class="dot-net" id="netDot">
-      </span>
-      <span id="netText">
-       Online
-      </span>
-     </div>
-     <div class="dash-stat dash-battery" title="Bateri peranti">
-      <span>
-       🔋
-      </span>
-      <span id="batPercent">
-       --%
-      </span>
-      <span class="battery-meter">
-       <span id="batLevel">
-       </span>
-      </span>
-     </div>
-    </div>
-    <div class="dashboard-addons">
-     <div class="header-addon">
-      <span class="addon-icon">
-       🕒
-      </span>
-      <span class="addon-copy">
-       <b id="headerClock">
-        --:--:--
-       </b>
-       <small id="headerDate">
-        Memuatkan tarikh...
-       </small>
-      </span>
-     </div>
-     <button class="header-addon header-addon-btn" id="headerFavAddon" onclick="v172FilterFavorites()" title="Tunjuk blog Favourite" type="button">
-      <span class="addon-icon">
-       &starf;
-      </span>
-      <span class="addon-copy">
-       <b>
-        <span id="headerFavCount">
-         0
+
+  <div id="notifBubble" role="status" aria-live="polite">Lanzkila Hub dimuatkan.</div>
+
+  <header class="dashboard-header site-header">
+    <div class="topbar-shell">
+      <a class="site-brand" href="#top" aria-label="Lanzkila Hub home">
+        <span class="brand-mark" aria-hidden="true">L</span>
+        <span class="brand-name">Lanzkila</span>
+      </a>
+
+      <label class="header-search" for="searchBar">
+        <span class="search-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </span>
-        Favourite
-       </b>
-       <small>
-        Klik untuk tapis
-       </small>
-      </span>
-     </button>
-     <button class="header-addon header-addon-btn" id="headerFeedAddon" onclick="v17RefreshFeeds()" title="Klik untuk semak feed sekarang" type="button">
-      <span class="addon-icon">
-       &checkmark;
-      </span>
-      <span class="addon-copy">
-       <b>
-        <span id="headerFeedOkCount">
-         0
-        </span>
-        /
-        <span id="headerFeedTotalCount">
-         0
-        </span>
-        Feed OK
-       </b>
-       <small id="headerLastSync">
-        Belum semak
-       </small>
-      </span>
-     </button>
+        <input id="searchBar" type="search" placeholder="Search projects..." autocomplete="off" oninput="searchFunction()">
+        <kbd>/</kbd>
+      </label>
+
+      <div class="header-actions" aria-label="Page actions">
+        <button class="topbar-button" id="refreshFeedBtn" type="button" onclick="v17RefreshFeeds()" title="Semak update">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M20 6v5h-5M4 18v-5h5M18.5 9A7 7 0 0 0 6.2 6.2L4 8m16 8-2.2 1.8A7 7 0 0 1 5.5 15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Refresh</span>
+        </button>
+        <button class="topbar-button" type="button" onclick="toggleTheme()" title="Appearance">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 3a9 9 0 1 0 9 9c0-.4 0-.8-.1-1.2A7 7 0 0 1 12 3Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg>
+          <span>Appearance</span>
+        </button>
+      </div>
     </div>
-   </div>
   </header>
-  <nav class="controls">
-   <input id="searchBar" onkeyup="searchFunction()" placeholder="Cari repository atau projek..." type="text">
-   <div id="trendingBox" onclick="quickSearch()">
-    Trending:
-    <b id="trendWord">
-     ...
-    </b>
-   </div>
-   <div class="sort-group">
-    <button class="sort-btn" onclick='sortGrid("name")'>
-     🔠 Nama
-    </button>
-    <button class="sort-btn" onclick='sortGrid("update")'>
-     🔥 Terkini
-    </button>
-   </div>
-   <div class="category-menu">
-    <span class="category-title">
-     Repositories
-    </span>
-    <div class="filter-group">
-     <button class="filter-btn active" onclick='filterBlog("all")'>
-      <span class="filter-icon">
-       ▦
-      </span>
-      <span>
-       Semua
-      </span>
-     </button>
-     <button class="filter-btn" onclick='filterBlog("cat1")'>
-      <span class="filter-icon">
-       ✦
-      </span>
-      <span>
-       Personal / Anime
-      </span>
-     </button>
-     <button class="filter-btn" onclick='filterBlog("cat2")'>
-      <span class="filter-icon">
-       ▶
-      </span>
-      <span>
-       Radio / TV
-      </span>
-     </button>
-     <button class="filter-btn" onclick='filterBlog("cat3")'>
-      <span class="filter-icon">
-       🔗
-      </span>
-      <span>
-       Safelink
-      </span>
-     </button>
-     <button class="filter-btn" onclick='filterBlog("cat4")'>
-      <span class="filter-icon">
-       ⚙
-      </span>
-      <span>
-       Tools
-      </span>
-     </button>
+
+  <main id="top" class="page-shell">
+    <section class="hero-section" aria-labelledby="pageTitle">
+      <div class="hero-logo" aria-hidden="true">
+        <span>L</span>
+      </div>
+      <div class="hero-copy">
+        <p class="eyebrow">Personal project index</p>
+        <h1 id="pageTitle">Lanzkila Hub</h1>
+        <p class="hero-description">A simple directory for projects, tools, sites and experiments — organised in one place.</p>
+      </div>
+
+      <div class="hero-status" aria-label="Hub status">
+        <div class="status-pill"><span class="dot-net" id="netDot"></span><span id="netText">Online</span></div>
+        <div class="status-pill"><strong id="vCount">0</strong><span>projects</span></div>
+        <button class="status-pill status-pill-button" type="button" onclick="v172OpenNewFilter()"><strong id="oCount">0</strong><span>updates</span></button>
+        <div class="status-pill"><strong id="aCount">0</strong><span>added</span></div>
+      </div>
+    </section>
+
+    <section class="directory-section" aria-labelledby="directoryTitle">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Browse</p>
+          <h2 id="directoryTitle">Directory</h2>
+        </div>
+        <p>Choose a category or search across everything.</p>
+      </div>
+
+      <nav class="controls" aria-label="Project filters">
+        <div class="category-menu">
+          <div class="filter-group">
+            <button class="filter-btn active" type="button" data-filter="all" onclick="filterBlog('all', this)">
+              <span class="filter-icon">⌂</span><span class="filter-copy"><span class="filter-name">All projects</span><span class="filter-desc">Everything in one directory</span></span><span class="filter-count">0</span>
+            </button>
+            <button class="filter-btn" type="button" data-filter="cat1" onclick="filterBlog('cat1', this)">
+              <span class="filter-icon">✦</span><span class="filter-copy"><span class="filter-name">Personal / Anime</span><span class="filter-desc">Personal pages and anime projects</span></span><span class="filter-count">0</span>
+            </button>
+            <button class="filter-btn" type="button" data-filter="cat2" onclick="filterBlog('cat2', this)">
+              <span class="filter-icon">▶</span><span class="filter-copy"><span class="filter-name">Radio / TV</span><span class="filter-desc">Players, streams and media hubs</span></span><span class="filter-count">0</span>
+            </button>
+            <button class="filter-btn" type="button" data-filter="cat3" onclick="filterBlog('cat3', this)">
+              <span class="filter-icon">↗</span><span class="filter-copy"><span class="filter-name">Safelink</span><span class="filter-desc">Redirect and utility link pages</span></span><span class="filter-count">0</span>
+            </button>
+            <button class="filter-btn" type="button" data-filter="cat4" onclick="filterBlog('cat4', this)">
+              <span class="filter-icon">⌘</span><span class="filter-copy"><span class="filter-name">Tools</span><span class="filter-desc">Converters, readers and project tools</span></span><span class="filter-count">0</span>
+            </button>
+            <button class="filter-btn new-filter" type="button" data-filter="new" onclick="filterBlog('new', this)">
+              <span class="filter-icon">●</span><span class="filter-copy"><span class="filter-name">Recently updated</span><span class="filter-desc">Projects active within the update window</span></span><span class="filter-count">0</span>
+            </button>
+          </div>
+        </div>
+      </nav>
+    </section>
+
+    <section class="projects-section" aria-labelledby="projectsTitle">
+      <div class="section-heading project-heading">
+        <div>
+          <p class="section-kicker">Resources</p>
+          <h2 id="projectsTitle">Projects</h2>
+        </div>
+        <div class="project-tools">
+          <div id="trendingBox" class="trend-chip" onclick="quickSearch()" title="Klik untuk cari trend">
+            Trending <strong id="trendWord">...</strong>
+          </div>
+          <div class="sort-group" aria-label="Sort projects">
+            <button class="sort-btn" type="button" onclick='sortGrid("name")'>Name</button>
+            <button class="sort-btn" type="button" onclick='sortGrid("update")'>Latest</button>
+          </div>
+          <button class="icon-button" id="viewToggleBtn" type="button" onclick="v17ToggleView()" title="Tukar paparan">☷</button>
+          <button class="icon-button" type="button" onclick="randomBlog()" title="Random project">↗</button>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="grid-container" id="blogGrid">
+          <noscript>JavaScript diperlukan untuk memaparkan senarai projek.</noscript>
+        </div>
+      </div>
+    </section>
+
+    <section class="site-note" aria-label="About this directory">
+      <div class="note-icon">i</div>
+      <div>
+        <strong>Easy to maintain.</strong>
+        <p>Project entries stay in <code>data.js</code>. Edit that one file whenever you want to add, remove or update a project.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-shell">
+      <span>© <span id="year"></span> Lanzkila</span>
+      <span class="footer-dot">•</span>
+      <span>Built for GitHub Pages</span>
+      <span class="footer-spacer"></span>
+      <button class="footer-link" type="button" onclick="v175ExportSettings()">Backup</button>
+      <button class="footer-link" type="button" onclick="v175ChooseImport()">Restore</button>
     </div>
-   </div>
-  </nav>
-  <div class="container">
-   <div class="grid-container" id="blogGrid">
-    <noscript>
-     JavaScript diperlukan untuk memaparkan senarai blog.
-    </noscript>
-   </div>
-  </div>
-  <button aria-label="Ke Atas" class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()" title="Ke Atas" type="button">
-   <span aria-hidden="true">
-    &uarr;
-   </span>
-  </button>
-  <div class="hub-divider">
-   <span>
-    End of repositories
-   </span>
-  </div>
-  <footer>
-   <div class="inner-box">
-    &copy;
-    <span id="year">
-    </span>
-    LanzMagick | All Right Reserved. - Created By Kirin
-   </div>
   </footer>
-  <div id="customMenu">
-   <div class="menu-opt" onclick="openCurrent()">
-    🌍 Buka Blog
-   </div>
-   <div class="menu-opt" onclick="copyCurrent()">
-    📋 Salin Pautan
-   </div>
+
+  <button class="scroll-top-btn" id="scrollTopBtn" type="button" onclick="scrollToTop()" aria-label="Return to top" title="Return to top">↑</button>
+
+  <!-- Compatibility / existing logic hooks. Kept out of the visual layout. -->
+  <div class="compat-hooks" aria-hidden="true">
+    <span id="greetText"></span>
+    <span id="headerClock"></span>
+    <span id="headerDate"></span>
+    <span id="headerFavCount">0</span>
+    <span id="headerFeedOkCount">0</span>
+    <span id="headerFeedTotalCount">0</span>
+    <span id="headerLastSync"></span>
+    <span id="batPercent"></span>
+    <span id="batLevel"></span>
+    <button id="headerFavAddon" type="button"></button>
+    <button id="headerFeedAddon" type="button"></button>
   </div>
-  <div id="linkLock">
-   <h3>
-    🔒 PAUTAN DIKUNCI
-   </h3>
-   <p style="font-size:11px; color:var(--sub); margin:0;">
-    Sila masukkan kunci akses v13.
-   </p>
-   <input id="lockKey" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;" type="password">
-   <div class="lock-btns">
-    <button id="btnUnlock" type="button">
-     BUKA SEKARANG
-    </button>
-    <button class="btn-cancel" onclick="closeLock()" type="button">
-     BATAL AKSES
-    </button>
-   </div>
+
+  <div id="customMenu" class="context-menu">
+    <button class="menu-opt" type="button" onclick="openCurrent()">Open project</button>
+    <button class="menu-opt" type="button" onclick="copyCurrent()">Copy link</button>
   </div>
-  <script src="data.js">
-  </script>
-  <script src="script.js">
-  </script>
- </body>
+
+  <div id="linkLock" class="lock-dialog" role="dialog" aria-modal="true" aria-labelledby="lockTitle">
+    <h3 id="lockTitle">Private link</h3>
+    <p>Masukkan kunci akses untuk membuka pautan ini.</p>
+    <input id="lockKey" type="password" placeholder="••••••" autocomplete="off">
+    <div class="lock-btns">
+      <button id="btnUnlock" type="button">Unlock</button>
+      <button class="btn-cancel" type="button" onclick="closeLock()">Cancel</button>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
 </html>

@@ -1,40 +1,80 @@
-# 🚀 Lanzkila Hub
+# Lanzkila Hub
 
-Hub projek peribadi untuk menguruskan repositori dan link penting.
+Direktori projek peribadi untuk GitHub Pages. Versi ini menggunakan UI baru yang **berinspirasikan struktur dan rasa visual Wotaku Wiki**: topbar minimal, carian sentiasa mudah dicapai, directory card besar, resource card bersih, dan light/dark mode yang neutral.
 
-## 🛠️ Teknologi
-- **HTML5 & CSS3**: Struktur dan paparan moden.
-- **JavaScript (Vanilla)**: Enjin utama untuk filter, search, dan sistem sekuriti.
-- **GitHub Pages**: Dihoskan secara percuma dan pantas.
+> Rework ini membuang visual tema GitHub-style v18 yang lama. Kod baharu dibuat sendiri untuk Lanzkila Hub; kandungan Wotaku Wiki tidak disalin.
 
-## ✨ Ciri-ciri Utama
-- 🔍 **Real-time Search**: Cari projek anda dengan pantas.
-- 🏷️ **Category Filter**: Susun projek mengikut kategori (Personal, Tools, dll).
-- 🔒 **Private Lock**: Sistem kunci untuk projek sensitif/peribadi.
-- 📊 **Live Stats**: Statistik automatik untuk jumlah projek dan update terkini.
-- 🌙 **Dark Mode Ready**: Sokongan tema gelap.
+## Fail utama
 
-## 📁 Struktur Fail
-- `index.html`: Kerangka utama website.
-- `style.css`: Rekaan antaramuka (UI).
-- `script.js`: Logik sistem (fungsi utama).
-- `data.js`: Fail untuk menambah/menguruskan link projek anda.
+- `index.html` — struktur halaman dan layout utama.
+- `style.css` — keseluruhan visual/responsive baharu.
+- `script.js` — search, filter, sort, favourite, feed status, tracking, backup/restore dan fungsi UI.
+- `data.js` — **sumber data projek. Edit fail ini untuk tambah atau ubah projek.**
 
-## 📝 Cara Tambah Projek Baru
-Hanya buka fail `data.js` dan tambah objek baru dalam array `blogData`:
+## Edit projek melalui `data.js`
 
-```javascript
-{ 
-  name: "Nama Projek", 
-  url: "[https://link-projek.com](https://link-projek.com)", 
-  cat: "cat1", 
-  desc: "Deskripsi ringkas", 
-  isPrivate: false 
-}
+`data.js` sengaja dikekalkan sebagai pusat data supaya tidak perlu sentuh HTML setiap kali menambah projek.
 
+Contoh:
 
-## 🎨 UI v18.0
-- Rework visual berinspirasikan GitHub/GitHub Pages repository UI.
-- Layout responsive untuk desktop dan telefon.
-- Light/dark mode menggunakan palet GitHub-style.
-- Core search, filter, tracking, feed, favourite, pin, backup/restore dan data projek dikekalkan.
+```js
+const blogData = [
+  {
+    name: "Nama Projek",
+    url: "https://github.com/username/repository",
+    cat: "cat4",
+    desc: "Penerangan ringkas projek.",
+    isPrivate: false,
+    isNew: false
+  }
+];
+```
+
+### Kategori
+
+| Nilai | Kategori |
+| --- | --- |
+| `cat1` | Personal / Anime |
+| `cat2` | Radio / TV |
+| `cat3` | Safelink |
+| `cat4` | Tools |
+
+`isPrivate: true` mengaktifkan logic private link sedia ada. `isNew` boleh digunakan untuk state data manual yang disokong renderer.
+
+## Ciri yang dikekalkan
+
+- Search projek secara langsung.
+- Filter kategori + filter New.
+- Sort Name / Latest / Added / Oldest.
+- Favourite / pin projek.
+- Feed/update state dan changelog tracker sedia ada.
+- Recently Opened.
+- Grid/List view.
+- Light/Dark appearance.
+- Backup dan restore settings browser.
+- Responsive desktop/laptop dan HP.
+- `data.js` kekal berasingan dan mudah diedit.
+
+## UI rework
+
+- Sticky topbar minimal.
+- Search berada terus di header.
+- Hero ringkas dengan status projek.
+- Directory menggunakan card besar seperti laman indeks/wiki moden.
+- Project/resource card lebih padat dan mudah dibaca.
+- Kurang gradient, glow, pill berlebihan dan dekorasi tema lama.
+- Stylesheet lama dibuang dan diganti sepenuhnya, bukan sekadar override tambahan.
+- Mobile menggunakan satu kolum dan action bar yang tidak bertindih.
+
+## Deploy ke GitHub Pages
+
+Upload/overwrite fail berikut pada root repository:
+
+```text
+index.html
+style.css
+script.js
+README.md
+```
+
+Jangan overwrite `data.js` jika repository kau sudah mempunyai senarai projek terkini. Patch rework ini memang direka supaya `data.js` lama boleh terus digunakan.

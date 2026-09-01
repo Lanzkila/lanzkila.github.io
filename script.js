@@ -367,7 +367,7 @@ function toggleFab() {
 
 function syncThemeColor(theme) {
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', theme === 'dark' ? '#161b22' : '#f6f8fa');
+  if (meta) meta.setAttribute('content', theme === 'dark' ? '#111113' : '#f7f7f8');
 }
 
 function toggleTheme() {
@@ -378,6 +378,21 @@ function toggleTheme() {
   syncThemeColor(nextTheme);
   try { localStorage.setItem('nimegun_theme_v175', nextTheme); } catch (e) {}
 }
+
+// Wotaku-style shortcut: tekan / untuk fokus carian, Esc untuk keluar dari carian.
+document.addEventListener('keydown', function(e) {
+  const search = document.getElementById('searchBar');
+  if (!search) return;
+  const tag = (e.target && e.target.tagName ? e.target.tagName : '').toLowerCase();
+  const typing = tag === 'input' || tag === 'textarea' || (e.target && e.target.isContentEditable);
+  if (e.key === '/' && !typing) {
+    e.preventDefault();
+    search.focus();
+    search.select();
+  } else if (e.key === 'Escape' && document.activeElement === search) {
+    search.blur();
+  }
+});
 
 function scrollToTop() {
   // v17.4.1: floating menu sudah dibuang, jadi jangan panggil v173CloseFab().
@@ -1507,8 +1522,11 @@ function v17SetupUI() {
   }
 
   const filters = [
-    ['all', '▦', 'Semua'], ['cat1', '✦', 'Personal / Anime'], ['cat2', '▶', 'Radio / TV'],
-    ['cat3', '🔗', 'Safelink'], ['cat4', '⚙', 'Tools']
+    ['all', '⌂', 'All projects', 'Everything in one directory'],
+    ['cat1', '✦', 'Personal / Anime', 'Personal pages and anime projects'],
+    ['cat2', '▶', 'Radio / TV', 'Players, streams and media hubs'],
+    ['cat3', '↗', 'Safelink', 'Redirect and utility link pages'],
+    ['cat4', '⌘', 'Tools', 'Converters, readers and project tools']
   ];
   const group = document.querySelector('.filter-group');
   if (group) {
@@ -1517,14 +1535,20 @@ function v17SetupUI() {
       const btn = document.createElement('button');
       btn.className = 'filter-btn' + (idx === 0 ? ' active' : '');
       btn.setAttribute('data-filter', item[0]);
-      btn.innerHTML = "<span class='filter-icon'>" + item[1] + "</span><span>" + item[2] + "</span><span class='filter-count'>0</span>";
+      btn.innerHTML = "<span class='filter-icon'>" + item[1] + "</span>"
+        + "<span class='filter-copy'><span class='filter-name'>" + item[2] + "</span>"
+        + "<span class='filter-desc'>" + item[3] + "</span></span>"
+        + "<span class='filter-count'>0</span>";
       btn.addEventListener('click', function() { filterBlog(item[0], btn); });
       group.appendChild(btn);
     });
     const newBtn = document.createElement('button');
     newBtn.className = 'filter-btn new-filter';
     newBtn.setAttribute('data-filter', 'new');
-    newBtn.innerHTML = "<span class='filter-icon'>🔥</span><span>New</span><span class='filter-count'>0</span>";
+    newBtn.innerHTML = "<span class='filter-icon'>●</span>"
+      + "<span class='filter-copy'><span class='filter-name'>Recently updated</span>"
+      + "<span class='filter-desc'>Projects active within the update window</span></span>"
+      + "<span class='filter-count'>0</span>";
     newBtn.addEventListener('click', function() { filterBlog('new', newBtn); });
     group.appendChild(newBtn);
   }
