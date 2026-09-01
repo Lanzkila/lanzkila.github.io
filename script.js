@@ -1,308 +1,350 @@
-/* --- 1. STARTUP & UTILITIES --- */
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // A. LOAD DATA DARI data.js
-    const grid = document.getElementById('blogGrid');
-    if (grid && typeof blogData !== 'undefined') {
-        blogData.forEach(item => {
-            const card = document.createElement('a');
-            card.className = `blog-card ${item.cat} ${item.isPrivate ? 'private' : ''}`;
-            card.href = item.url;
-            card.target = '_blank';
-            
-            // Semak status new (mengikut properti isNew dari data.js)
-            const displayNew = item.isNew ? 'inline-block' : 'none';
-            
-            card.innerHTML = `
-                <div class='badge-container'><span class='badge-new' style='display: ${displayNew};'>New</span></div>
-                <h3><span class='status-dot status-online'></span>${item.name}</h3>
-                <p>${item.desc}</p>
-                <span class='last-update' data-time='2026-06-13'></span>
-            `;
-            grid.appendChild(card);
-        });
-    }
+/* Lanzkila Project Hub — Komikku-inspired redesign */
+let activeCategory = 'all';
+let currentMenuUrl = '';
+let pendingUrl = '';
+const defaultMasterKey = 'LanzKey99';
 
-    // B. FUNGSI SISTEM (Startup)
-    if (typeof updateTrendUI === "function") updateTrendUI();
-    if (typeof updateNetStatus === "function") updateNetStatus();
-    if (typeof initAdminSystem === "function") initAdminSystem();
+const categoryNames = {
+  cat1: 'Personal / Anime',
+  cat2: 'Radio / TV',
+  cat3: 'Safelink',
+  cat4: 'Tools'
+};
 
-    // Set Tahun Footer
-    const yearEl = document.getElementById('year');
-    if(yearEl) yearEl.innerText = new Date().getFullYear();
+function escapeHtml(value = '') {
+  return String(value).replace(/[&<>'"]/g, char => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;'
+  }[char]));
+}
 
-    // Mod Incognito & Statistik Tracker
-    setupIncognito();
-    setupStatsTracker();
-    
-    // C. ANIMASI REVEAL
-    if (typeof initReveal === "function") initReveal();
+function renderProjects() {
+  const grid = document.getElementById('blogGrid');
+  if (!grid || typeof blogData === 'undefined') return;
 
-    // Notifikasi
-    setTimeout(() => {
-        const notif = document.getElementById('notifBubble');
-        if(notif) {
-            notif.classList.add('show');
-            setTimeout(() => { notif.classList.remove('show'); }, 5000);
-        }
-    }, 2000);
-});
+  grid.innerHTML = '';
+  blogData.forEach((item, index) => {
+    const card = document.createElement('a');
+    card.className = `blog-card ${item.cat || ''} ${item.isPrivate ? 'private' : ''}`;
+    card.href = item.url;
+    card.target = '_blank';
+    card.rel = 'noopener noreferrer';
+    card.dataset.name = String(item.name || '').toLowerCase();
+    card.dataset.index = String(index);
+    card.innerHTML = `
+      <div class="card-top">
+        <div class="repo-icon">${escapeHtml((item.name || 'K').trim().charAt(0).toUpperCase())}</div>
+        <div class="badge-container">
+          <span class="badge-new" style="display:${item.isNew ? 'inline-flex' : 'none'}">New</span>
+        </div>
+      </div>
+      <h3>${escapeHtml(item.name || 'Untitled project')}</h3>
+      <p>${escapeHtml(item.desc || 'No description available.')}</p>
+      <div class="card-foot">
+        <span class="card-category">${escapeHtml(categoryNames[item.cat] || 'Project')}</span>
+        <span class="card-open">Open
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+        </span>
+      </div>`;
 
-/* --- 2. SEARCH & FILTER --- */
+    if (localStorage.getItem(item.url) === 'visited') card.classList.add('visited');
+    grid.appendChild(card);
+  });
+
+  initReveal();
+  applyFilters();
+  updateCounts();
+}
+
+function updateCounts() {
+  const all = document.querySelectorAll('.blog-card').length;
+  const newCount = [...document.querySelectorAll('.badge-new')].filter(el => el.style.display !== 'none').length;
+  const visible = [...document.querySelectorAll('.blog-card')].filter(card => !card.classList.contains('hidden') && !card.classList.contains('search-hidden')).length;
+  const v = document.getElementById('vCount');
+  const o = document.getElementById('oCount');
+  const shown = document.getElementById('visibleCount');
+  const empty = document.getElementById('emptyState');
+  if (v) v.textContent = all;
+  if (o) o.textContent = newCount;
+  if (shown) shown.textContent = visible;
+  if (empty) empty.hidden = visible !== 0;
+}
+
 function searchFunction() {
-  const searchBar = document.getElementById('searchBar');
-  if(!searchBar) return;
-  let input = searchBar.value.toLowerCase();
-  document.querySelectorAll('.blog-card').forEach(card => {
-    let title = card.querySelector('h3').innerText.toLowerCase();
-    card.style.display = title.includes(input) ? "" : "none";
-  });
-}
-
-function filterBlog(c) {
-  let btns = document.querySelectorAll('.filter-btn');
-  btns.forEach(b => b.classList.remove('active'));
-  if(window.event && window.event.target) window.event.target.classList.add('active');
+  const search = document.getElementById('searchBar');
+  if (!search) return;
+  const query = search.value.trim().toLowerCase();
 
   document.querySelectorAll('.blog-card').forEach(card => {
-    if (c === 'all') {
-      card.classList.remove('hidden');
-    } else {
-      card.classList.toggle('hidden', !card.classList.contains(c));
-    }
+    const text = `${card.dataset.name || ''} ${card.textContent || ''}`.toLowerCase();
+    card.classList.toggle('search-hidden', !!query && !text.includes(query));
   });
-}
 
-/* --- 3. UI UTILITIES --- */
-function toggleFab() { 
-  const fabBtn = document.getElementById('fabBtn');
-  const fabMenu = document.getElementById('fabMenu');
-  if(fabBtn && fabMenu) {
-    fabBtn.classList.toggle('active');
-    fabMenu.classList.toggle('show');
+  if (query.length >= 2) {
+    searchHistory[query] = (searchHistory[query] || 0) + 1;
+    localStorage.setItem('searchTrend', JSON.stringify(searchHistory));
+    updateTrendUI();
   }
+  updateCounts();
 }
 
-function toggleTheme() {
-  const b = document.body;
-  const currentTheme = b.getAttribute('data-theme');
-  b.setAttribute('data-theme', currentTheme === 'light' ? 'dark' : 'light');
+function filterBlog(category, button) {
+  activeCategory = category;
+  document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+  if (button) button.classList.add('active');
+  applyFilters();
 }
 
-function scrollToTop() { 
-  window.scrollTo({top: 0, behavior: 'smooth'}); 
+function applyFilters() {
+  document.querySelectorAll('.blog-card').forEach(card => {
+    card.classList.toggle('hidden', activeCategory !== 'all' && !card.classList.contains(activeCategory));
+  });
+  updateCounts();
+}
+
+function sortGrid(mode) {
+  const grid = document.getElementById('blogGrid');
+  if (!grid) return;
+  const cards = [...grid.querySelectorAll('.blog-card')];
+
+  cards.sort((a, b) => {
+    if (mode === 'name') return (a.dataset.name || '').localeCompare(b.dataset.name || '');
+    return Number(b.dataset.index || 0) - Number(a.dataset.index || 0);
+  });
+  cards.forEach(card => grid.appendChild(card));
 }
 
 function randomBlog() {
-  const cards = document.querySelectorAll('.blog-card');
-  if (cards.length > 0) {
-    const randomIndex = Math.floor(Math.random() * cards.length);
-    const randomUrl = cards[randomIndex].getAttribute('href');
-    alert("🎲 Memilih blog rawak untuk anda...");
-    window.open(randomUrl, '_blank');
-  }
+  const cards = [...document.querySelectorAll('.blog-card')].filter(card =>
+    !card.classList.contains('hidden') &&
+    !card.classList.contains('search-hidden') &&
+    !card.classList.contains('private')
+  );
+  if (!cards.length) return;
+  const chosen = cards[Math.floor(Math.random() * cards.length)];
+  window.open(chosen.href, '_blank', 'noopener');
 }
 
-window.onscroll = function() {
-  let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-  let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-  const myBar = document.getElementById("myBar");
-  if(myBar && height > 0) {
-    myBar.style.width = (winScroll / height) * 100 + "%";
-  }
-};
-
-/* --- 4. DATA TRACKERS --- */
-function setupStatsTracker() {
-  setInterval(function() {
-    var a = document.querySelectorAll('.blog-card').length;
-    var u = Array.from(document.querySelectorAll('.badge-new')).filter(function(b){ return b.style.display !== 'none' }).length;
-    if (document.getElementById('vCount')) document.getElementById('vCount').innerText = a;
-    if (document.getElementById('oCount')) document.getElementById('oCount').innerText = u;
-  }, 3000);
+function toggleTheme() {
+  const body = document.body;
+  const next = body.dataset.theme === 'dark' ? 'light' : 'dark';
+  body.dataset.theme = next;
+  localStorage.setItem('lanzkila-theme', next);
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', next === 'dark' ? '#111113' : '#ffffff');
 }
 
-document.addEventListener('click', function(e) {
-  const card = e.target.closest('.blog-card');
-  if(card) {
-    localStorage.setItem(card.href, 'visited');
-    card.classList.add('visited');
-  }
-});
+function toggleMobileMenu() {
+  const nav = document.getElementById('mobileNav');
+  const btn = document.getElementById('mobileMenuBtn');
+  if (!nav || !btn) return;
+  const open = nav.classList.toggle('open');
+  btn.setAttribute('aria-expanded', String(open));
+}
 
-/* --- 5. NETWORK & TRENDING --- */
+function closeMobileMenu() {
+  document.getElementById('mobileNav')?.classList.remove('open');
+  document.getElementById('mobileMenuBtn')?.setAttribute('aria-expanded', 'false');
+}
+
+function scrollToTop() { window.scrollTo({top:0,behavior:'smooth'}); }
+
 function updateNetStatus() {
   const dot = document.getElementById('netDot');
-  const txt = document.getElementById('netText');
-  if (!dot || !txt) return;
-  if (navigator.onLine) {
-    dot.classList.remove('offline');
-    txt.innerText = "Online";
-    txt.style.color = "#22c55e";
-  } else {
-    dot.classList.add('offline');
-    txt.innerText = "Offline";
-    txt.style.color = "#ef4444";
-  }
+  const text = document.getElementById('netText');
+  if (!dot || !text) return;
+  const online = navigator.onLine;
+  dot.classList.toggle('offline', !online);
+  text.textContent = online ? 'Online' : 'Offline';
 }
-window.addEventListener('online', updateNetStatus);
-window.addEventListener('offline', updateNetStatus);
 
-let searchHistory = JSON.parse(localStorage.getItem('searchTrend')) || {};
+let searchHistory = JSON.parse(localStorage.getItem('searchTrend') || '{}');
 function updateTrendUI() {
-  const topSearch = Object.keys(searchHistory).reduce((a, b) => (searchHistory[a] || 0) > (searchHistory[b] || 0) ? a : b, "...");
-  const trendWord = document.getElementById('trendWord');
-  if(trendWord) trendWord.innerText = topSearch;
+  const keys = Object.keys(searchHistory);
+  const top = keys.length ? keys.reduce((best, key) => (searchHistory[key] || 0) > (searchHistory[best] || 0) ? key : best, keys[0]) : '...';
+  const el = document.getElementById('trendWord');
+  if (el) el.textContent = top;
 }
-
 function quickSearch() {
-  const word = document.getElementById('trendWord').innerText;
-  if(word !== "...") {
-    document.getElementById('searchBar').value = word;
+  const trend = document.getElementById('trendWord')?.textContent || '...';
+  const input = document.getElementById('searchBar');
+  if (input && trend !== '...') {
+    input.value = trend;
     searchFunction();
-  }
-}
-
-/* --- 6. ADVANCED SYSTEM --- */
-function setupIncognito() {
-  let pressTimer;
-  const headerTitle = document.querySelector('header h1');
-  if(headerTitle) {
-    const startP = function() {
-      pressTimer = window.setTimeout(function() {
-        document.body.classList.toggle('incognito-active');
-        alert(document.body.classList.contains('incognito-active') ? "🕵️ Mod Incognito Aktif" : "🔓 Mod Pentadbir Aktif");
-      }, 2000);
-    };
-    const cancelP = function() { clearTimeout(pressTimer); };
-    headerTitle.addEventListener('mousedown', startP);
-    headerTitle.addEventListener('mouseup', cancelP);
-    headerTitle.addEventListener('touchstart', startP, {passive: true});
-    headerTitle.addEventListener('touchend', cancelP);
-  }
-}
-
-let currentMenuUrl = "";
-document.addEventListener('contextmenu', function(e) {
-  const card = e.target.closest('.blog-card');
-  if (card) {
-    e.preventDefault();
-    currentMenuUrl = card.href;
-    const menu = document.getElementById('customMenu');
-    if (menu) {
-      menu.style.display = 'block';
-      menu.style.left = e.clientX + 'px';
-      menu.style.top = e.clientY + 'px';
-    }
-  }
-});
-
-document.addEventListener('click', function(e) {
-  const menu = document.getElementById('customMenu');
-  if (menu && !e.target.closest('#customMenu')) menu.style.display = 'none';
-});
-
-function openCurrent() { if(currentMenuUrl) window.open(currentMenuUrl, '_blank'); }
-function copyCurrent() { 
-  if(currentMenuUrl) {
-    navigator.clipboard.writeText(currentMenuUrl); 
-    alert("✅ Pautan berjaya disalin!"); 
+    input.focus();
   }
 }
 
 function initAdminSystem() {
-  const greetText = document.getElementById('greetText');
-  if (greetText) {
-    const hr = new Date().getHours();
-    let greet = "Selamat Malam, Admin 🌙";
-    if (hr < 12) greet = "Selamat Pagi, Admin 🌅";
-    else if (hr < 18) greet = "Selamat Petang, Admin ☀️";
-    greetText.innerText = greet;
+  const greeting = document.getElementById('greetText');
+  if (greeting) {
+    const hour = new Date().getHours();
+    greeting.textContent = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
   }
+
   if (navigator.getBattery) {
-    navigator.getBattery().then(bat => {
-      const batLevel = document.getElementById('batLevel');
-      if (batLevel) {
-        const updateBat = () => { batLevel.style.width = (bat.level * 100) + "%"; };
-        updateBat();
-        bat.addEventListener('levelchange', updateBat);
-      }
-    });
+    navigator.getBattery().then(battery => {
+      const level = document.getElementById('batLevel');
+      if (!level) return;
+      const paint = () => { level.style.width = `${Math.round(battery.level * 100)}%`; };
+      paint();
+      battery.addEventListener('levelchange', paint);
+    }).catch(() => {});
   }
 }
 
 function initReveal() {
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry, index) => {
+  const cards = document.querySelectorAll('.blog-card');
+  if (!('IntersectionObserver' in window)) {
+    cards.forEach(card => card.classList.add('reveal'));
+    return;
+  }
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
       if (entry.isIntersecting) {
-        setTimeout(() => { entry.target.classList.add('reveal'); }, index * 100); 
+        entry.target.classList.add('reveal');
+        observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.1 });
-  document.querySelectorAll('.blog-card').forEach(card => observer.observe(card));
+  }, {threshold:.08});
+  cards.forEach(card => observer.observe(card));
 }
 
-/* --- LOCK LOGIC (Dual: Dynamic Generated Key + SHA-256 Hash Storage) --- */
-var pendingUrl = "";
-// Tentukan password default anda di sini (cth: "LanzKey99")
-var defaultMasterKey = "LanzKey99"; 
+function setupIncognito() {
+  let timer;
+  const mark = document.querySelector('.brand-mark');
+  if (!mark) return;
+  const start = () => { timer = setTimeout(() => document.body.classList.toggle('incognito-active'), 1800); };
+  const cancel = () => clearTimeout(timer);
+  mark.addEventListener('mousedown', start);
+  mark.addEventListener('mouseup', cancel);
+  mark.addEventListener('mouseleave', cancel);
+  mark.addEventListener('touchstart', start, {passive:true});
+  mark.addEventListener('touchend', cancel);
+}
 
-// Fungsi untuk pastikan kunci/hash sentiasa wujud dalam localStorage
 async function getActiveMasterHash() {
   let savedHash = localStorage.getItem('site_master_hash');
-  
-  if (!savedHash) {
-    // Jika tiada (atau lepas clear cache), auto-generate hash daripada defaultMasterKey
-    const encoder = new TextEncoder();
-    const data = encoder.encode(defaultMasterKey);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    savedHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    
-    // Simpan hash tersebut ke dalam localStorage
-    localStorage.setItem('site_master_hash', savedHash);
-  }
+  if (savedHash) return savedHash;
+  const data = new TextEncoder().encode(defaultMasterKey);
+  const buffer = await crypto.subtle.digest('SHA-256', data);
+  savedHash = [...new Uint8Array(buffer)].map(b => b.toString(16).padStart(2,'0')).join('');
+  localStorage.setItem('site_master_hash', savedHash);
   return savedHash;
 }
 
-document.addEventListener('click', function(e) {
-  var card = e.target.closest('.blog-card');
-  if (card && card.classList.contains('private')) {
-    e.preventDefault();
-    pendingUrl = card.href;
-    document.getElementById('linkLock').style.display = 'block';
-    setTimeout(function() { document.getElementById('lockKey').focus(); }, 100);
-  }
-});
+function openLock(url) {
+  pendingUrl = url;
+  document.getElementById('linkLock')?.classList.add('show');
+  document.getElementById('linkLockBackdrop')?.classList.add('show');
+  setTimeout(() => document.getElementById('lockKey')?.focus(), 80);
+}
+function closeLock() {
+  document.getElementById('linkLock')?.classList.remove('show');
+  document.getElementById('linkLockBackdrop')?.classList.remove('show');
+  const input = document.getElementById('lockKey');
+  if (input) input.value = '';
+}
 
-const btnUnlock = document.getElementById('btnUnlock');
-if(btnUnlock) {
-  btnUnlock.onclick = async function() {
-    var userInput = document.getElementById('lockKey').value;
-    
-    // Tukar input pengguna kepada SHA-256 secara langsung
-    const encoder = new TextEncoder();
-    const data = encoder.encode(userInput);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    var userInputHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+function openCurrent() { if (currentMenuUrl) window.open(currentMenuUrl, '_blank', 'noopener'); hideContextMenu(); }
+async function copyCurrent() {
+  if (!currentMenuUrl) return;
+  try { await navigator.clipboard.writeText(currentMenuUrl); showToast('Repository link copied.'); }
+  catch { showToast('Unable to copy the link.'); }
+  hideContextMenu();
+}
+function hideContextMenu() { const menu = document.getElementById('customMenu'); if (menu) menu.style.display = 'none'; }
+function showToast(message) {
+  const toast = document.getElementById('notifBubble');
+  if (!toast) return;
+  toast.textContent = message;
+  toast.classList.add('show');
+  clearTimeout(showToast.timer);
+  showToast.timer = setTimeout(() => toast.classList.remove('show'), 2800);
+}
 
-    // Ambil hash yang aktif daripada localStorage (auto-generate baharu jika cache clear)
-    var activeHash = await getActiveMasterHash();
+function updateScrollUI() {
+  const top = window.scrollY || document.documentElement.scrollTop;
+  const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  const bar = document.getElementById('myBar');
+  if (bar) bar.style.width = height > 0 ? `${(top / height) * 100}%` : '0%';
+  document.getElementById('backToTop')?.classList.toggle('show', top > 500);
+}
 
-    // Semak sama ada hash input sepadan dengan hash tersimpan
-    if (userInputHash === activeHash) {
-      window.open(pendingUrl, '_blank');
+function installEvents() {
+  window.addEventListener('online', updateNetStatus);
+  window.addEventListener('offline', updateNetStatus);
+  window.addEventListener('scroll', updateScrollUI, {passive:true});
+
+  document.addEventListener('keydown', event => {
+    if (event.key === '/' && document.activeElement?.tagName !== 'INPUT') {
+      event.preventDefault();
+      document.getElementById('searchBar')?.focus();
+    }
+    if (event.key === 'Escape') {
+      closeMobileMenu();
+      closeLock();
+      hideContextMenu();
+    }
+  });
+
+  document.addEventListener('click', event => {
+    const card = event.target.closest('.blog-card');
+    if (card) {
+      if (card.classList.contains('private')) {
+        event.preventDefault();
+        openLock(card.href);
+        return;
+      }
+      localStorage.setItem(card.href, 'visited');
+      card.classList.add('visited');
+    }
+    if (!event.target.closest('#customMenu')) hideContextMenu();
+  });
+
+  document.addEventListener('contextmenu', event => {
+    const card = event.target.closest('.blog-card');
+    if (!card) return;
+    event.preventDefault();
+    currentMenuUrl = card.href;
+    const menu = document.getElementById('customMenu');
+    if (!menu) return;
+    menu.style.display = 'block';
+    const maxX = window.innerWidth - 175;
+    const maxY = window.innerHeight - 100;
+    menu.style.left = `${Math.max(8, Math.min(event.clientX, maxX))}px`;
+    menu.style.top = `${Math.max(8, Math.min(event.clientY, maxY))}px`;
+  });
+
+  const unlock = document.getElementById('btnUnlock');
+  if (unlock) unlock.addEventListener('click', async () => {
+    const input = document.getElementById('lockKey');
+    if (!input) return;
+    const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input.value));
+    const hash = [...new Uint8Array(buffer)].map(b => b.toString(16).padStart(2,'0')).join('');
+    if (hash === await getActiveMasterHash()) {
+      window.open(pendingUrl, '_blank', 'noopener');
       closeLock();
     } else {
-      alert("Kunci Salah Bah!");
-      document.getElementById('lockKey').value = "";
+      showToast('Access key is incorrect.');
+      input.value = '';
+      input.focus();
     }
-  };
+  });
 }
 
-function closeLock() {
-  document.getElementById('linkLock').style.display = 'none';
-  document.getElementById('lockKey').value = "";
-}
+document.addEventListener('DOMContentLoaded', () => {
+  const storedTheme = localStorage.getItem('lanzkila-theme');
+  if (storedTheme === 'dark' || storedTheme === 'light') document.body.dataset.theme = storedTheme;
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', document.body.dataset.theme === 'dark' ? '#111113' : '#ffffff');
+
+  renderProjects();
+  updateTrendUI();
+  updateNetStatus();
+  initAdminSystem();
+  setupIncognito();
+  installEvents();
+  updateScrollUI();
+
+  const year = document.getElementById('year');
+  if (year) year.textContent = new Date().getFullYear();
+  setTimeout(() => showToast('Lanzkila Pages is ready.'), 650);
+});

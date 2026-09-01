@@ -1,84 +1,223 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lanzkila Pages</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="Lanzkila project hub — koleksi tools, reader dan projek web dari GitHub.">
+  <title>Lanzkila — Project Hub</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body data-theme='light'>
+<body data-theme="light">
+  <div class="progress-container" aria-hidden="true">
+    <div class="progress-bar" id="myBar"></div>
+  </div>
 
-    <div class='progress-container'>
-        <div class='progress-bar' id='myBar'></div>
-    </div>
-    
-    <div id='notifBubble'>🔔 Lanzkila Live Berjaya Dimuatkan!</div>
+  <div class="site-toast" id="notifBubble" role="status" aria-live="polite">
+    Lanzkila Pages berjaya dimuatkan.
+  </div>
 
-    <header>
-        <span class='admin-welcome' id='greetText'>Sistem Dimuatkan...</span>
-        <h1>Nimegun</h1>
-        <div class='battery-meter'><div id='batLevel'></div></div>
-        <div class='stats-bar'>📁 Total Repo: <span id='vCount'>0</span> | 🔥 Update Baru: <span id='oCount'>0</span></div>
-        <div class='net-status'>
-            <div class='dot-net' id='netDot'></div> <span id='netText'>Online</span>
-        </div>
-    </header>
-  
-    <div class='hub-divider'><span>Menu</span></div>
+  <header class="site-header" id="siteHeader">
+    <div class="nav-shell">
+      <a class="site-brand" href="#home" aria-label="Lanzkila Home">
+        <span class="brand-mark" aria-hidden="true">K</span>
+        <span class="brand-name">Lanzkila</span>
+      </a>
 
-    <nav class='controls'>
-        <input id='searchBar' onkeyup='searchFunction()' placeholder='Cari nama repo...' type='text'/>
-        <div id='trendingBox' onclick='quickSearch()'>Trending: <b id='trendWord'>...</b></div>
-        <div class='sort-group'>
-            <button class='sort-btn' onclick='sortGrid("name")'>🔠 Nama</button>
-            <button class='sort-btn' onclick='sortGrid("update")'>🔥 Terkini</button>
-        </div>
-        <div class='filter-group'>
-            <button class='filter-btn active' onclick='filterBlog("all")'>Semua</button>
-            <button class='filter-btn' onclick='filterBlog("cat1")'>Personal/Anime</button>
-            <button class='filter-btn' onclick='filterBlog("cat2")'>Radio/TV</button>
-            <button class='filter-btn' onclick='filterBlog("cat3")'>Safelink</button>
-            <button class='filter-btn' onclick='filterBlog("cat4")'>Tools</button>
-        </div>
-    </nav>
+      <nav class="desktop-nav" aria-label="Navigasi utama">
+        <a href="#home">Home</a>
+        <a href="#projects">Projects</a>
+        <a href="#about">About</a>
+      </nav>
 
-    <div class='container'>
-        <div class='grid-container' id='blogGrid'></div>
-    </div>
-  
-    <div class='fab-container'>
-        <button class='fab-main' id='fabBtn' onclick='toggleFab()'>+</button>
-        <div class='fab-menu' id='fabMenu'>
-            <div class='menu-item' onclick='toggleTheme()'>🌓 Tukar Tema</div>
-            <div class='menu-item' onclick='scrollToTop()'>🚀 Ke Atas</div>
-            <div class='menu-item menu-surprise' onclick='randomBlog()'>🎲 Surprise Repo!</div>
+      <div class="nav-actions">
+        <div class="network-pill" title="Network status">
+          <span class="dot-net" id="netDot"></span>
+          <span id="netText">Online</span>
         </div>
+        <button class="nav-icon-btn" id="themeBtn" type="button" onclick="toggleTheme()" aria-label="Tukar tema" title="Appearance">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.9-.1-1.34A7 7 0 0 1 12 3Z"/></svg>
+        </button>
+        <button class="nav-icon-btn mobile-menu-btn" id="mobileMenuBtn" type="button" onclick="toggleMobileMenu()" aria-label="Buka menu" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+      </div>
     </div>
 
-    <div class='hub-divider'><span>Tamat Halaman</span></div>
-  
-    <footer>
-        <div class='inner-box'>
-            &#169; <span id='year'></span> LanzMagick | All Right Reserved. - Created By Kirin
-        </div>
-    </footer>
-  
-    <div id='customMenu'>
-        <div class='menu-opt' onclick='openCurrent()'>🌍 Buka Repo</div>
-        <div class='menu-opt' onclick='copyCurrent()'>📋 Salin Pautan</div>
+    <div class="mobile-nav" id="mobileNav">
+      <a href="#home" onclick="closeMobileMenu()">Home</a>
+      <a href="#projects" onclick="closeMobileMenu()">Projects</a>
+      <a href="#about" onclick="closeMobileMenu()">About</a>
     </div>
-  
-    <div id='linkLock'>
-        <h3>🔒 PAUTAN DIKUNCI</h3>
-        <p style='font-size:11px; color:var(--sub); margin:0;'>Sila masukkan kunci akses.</p>
-        <input id='lockKey' placeholder='••••••' type='password'/>
-        <div class='lock-btns'>
-            <button id='btnUnlock' type='button'>BUKA SEKARANG</button>
-            <button class='btn-cancel' onclick='closeLock()' type='button'>BATAL AKSES</button>
-        </div>
-    </div>
+  </header>
 
-    <script src="data.js"></script>
-    <script src="script.js"></script>
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-shell">
+        <div class="hero-copy">
+          <div class="hero-kicker">OPEN PROJECT COLLECTION</div>
+          <h1><span>Lanzkila</span><br>Project Hub</h1>
+          <p>
+            Satu tempat untuk menjelajah tools, reader, converter dan eksperimen web yang dibina dalam ekosistem Lanzkila.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-cta" href="#projects">Browse projects</a>
+            <button class="secondary-cta" type="button" onclick="randomBlog()">Surprise me</button>
+          </div>
+          <div class="hero-meta">
+            <span><b id="vCount">0</b> projects</span>
+            <span class="meta-dot"></span>
+            <span><b id="oCount">0</b> new</span>
+            <span class="meta-dot"></span>
+            <span id="greetText">Welcome</span>
+          </div>
+          <div class="battery-track" aria-label="Battery status"><div id="batLevel"></div></div>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+          <div class="mock-window">
+            <div class="mock-topbar">
+              <span></span><span></span><span></span>
+              <div class="mock-address">lanzkila.github.io</div>
+            </div>
+            <div class="mock-content">
+              <div class="mock-sidebar">
+                <div class="mock-logo">K</div>
+                <i></i><i></i><i></i><i></i>
+              </div>
+              <div class="mock-main">
+                <div class="mock-heading"></div>
+                <div class="mock-subheading"></div>
+                <div class="mock-grid">
+                  <div class="mock-card"><span>CBZ</span></div>
+                  <div class="mock-card"><span>PDF</span></div>
+                  <div class="mock-card"><span>WEB</span></div>
+                  <div class="mock-card"><span>L4D2</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="visual-chip chip-a">GitHub Pages</div>
+          <div class="visual-chip chip-b">Responsive</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="feature-strip" aria-label="Highlights">
+      <div class="content-shell feature-grid">
+        <article class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg>
+          </div>
+          <div><h2>Project library</h2><p>Cari semua repo dari satu katalog yang ringkas.</p></div>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16M12 4v16M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>
+          </div>
+          <div><h2>Quick discovery</h2><p>Search, kategori, sort dan random project tanpa reload.</p></div>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.5-.04-.98-.12-1.45A7 7 0 0 1 12 3Z"/></svg>
+          </div>
+          <div><h2>Appearance</h2><p>Light dan dark mode dengan layout desktop + HP.</p></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="projects-section" id="projects">
+      <div class="content-shell">
+        <div class="section-heading">
+          <div>
+            <span class="section-eyebrow">EXPLORE</span>
+            <h2>Projects</h2>
+            <p>Pilih projek mengikut kategori atau cari terus berdasarkan nama.</p>
+          </div>
+          <div class="result-summary"><span id="visibleCount">0</span> shown</div>
+        </div>
+
+        <div class="project-toolbar">
+          <label class="search-box" for="searchBar">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input id="searchBar" oninput="searchFunction()" placeholder="Search projects..." type="search" autocomplete="off">
+            <kbd>/</kbd>
+          </label>
+
+          <div class="toolbar-row">
+            <div class="filter-group" id="filterGroup">
+              <button class="filter-btn active" type="button" onclick="filterBlog('all', this)">All</button>
+              <button class="filter-btn" type="button" onclick="filterBlog('cat1', this)">Personal / Anime</button>
+              <button class="filter-btn" type="button" onclick="filterBlog('cat2', this)">Radio / TV</button>
+              <button class="filter-btn" type="button" onclick="filterBlog('cat3', this)">Safelink</button>
+              <button class="filter-btn" type="button" onclick="filterBlog('cat4', this)">Tools</button>
+            </div>
+
+            <div class="sort-group">
+              <button class="sort-btn" type="button" onclick="sortGrid('name')">A–Z</button>
+              <button class="sort-btn" type="button" onclick="sortGrid('update')">Latest</button>
+            </div>
+          </div>
+
+          <button class="trending-box" id="trendingBox" type="button" onclick="quickSearch()">
+            <span>Trending search</span><b id="trendWord">...</b>
+          </button>
+        </div>
+
+        <div class="grid-container" id="blogGrid"></div>
+        <div class="empty-state" id="emptyState" hidden>
+          <div class="empty-icon">K</div>
+          <h3>No projects found</h3>
+          <p>Cuba kata kunci atau kategori lain.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section" id="about">
+      <div class="content-shell about-card">
+        <div>
+          <span class="section-eyebrow">ABOUT</span>
+          <h2>Built as a simple GitHub Pages hub.</h2>
+          <p>Semua data projek kekal di <code>data.js</code>, jadi repo baru boleh ditambah tanpa mengubah struktur halaman.</p>
+        </div>
+        <a class="secondary-cta" href="#projects">View projects</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="content-shell footer-shell">
+      <div class="footer-brand">
+        <span class="brand-mark small">K</span>
+        <div><strong>Lanzkila</strong><span>Project Hub</span></div>
+      </div>
+      <p>© <span id="year"></span> Lanzkila. Created by Kirin.</p>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="backToTop" type="button" onclick="scrollToTop()" aria-label="Kembali ke atas">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 14 6-6 6 6"/></svg>
+  </button>
+
+  <div class="context-menu" id="customMenu" role="menu">
+    <button class="menu-opt" type="button" onclick="openCurrent()">Open repository</button>
+    <button class="menu-opt" type="button" onclick="copyCurrent()">Copy link</button>
+  </div>
+
+  <div class="modal-backdrop" id="linkLockBackdrop" onclick="closeLock()"></div>
+  <section class="lock-modal" id="linkLock" role="dialog" aria-modal="true" aria-labelledby="lockTitle">
+    <div class="lock-mark">K</div>
+    <span class="section-eyebrow">PRIVATE PROJECT</span>
+    <h3 id="lockTitle">Protected repository</h3>
+    <p>Masukkan kunci akses untuk membuka pautan ini.</p>
+    <input id="lockKey" placeholder="Access key" type="password" autocomplete="current-password">
+    <div class="lock-btns">
+      <button id="btnUnlock" class="primary-cta" type="button">Unlock</button>
+      <button class="secondary-cta" onclick="closeLock()" type="button">Cancel</button>
+    </div>
+  </section>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
