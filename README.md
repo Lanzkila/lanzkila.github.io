@@ -31,3 +31,10 @@ Hanya buka fail `data.js` dan tambah objek baru dalam array `blogData`:
   desc: "Deskripsi ringkas", 
   isPrivate: false 
 }
+
+
+## 🎨 UI v18.0
+- Rework visual berinspirasikan GitHub/GitHub Pages repository UI.
+- Layout responsive untuk desktop dan telefon.
+- Light/dark mode menggunakan palet GitHub-style.
+- Core search, filter, tracking, feed, favourite, pin, backup/restore dan data projek dikekalkan.

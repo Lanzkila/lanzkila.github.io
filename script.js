@@ -365,11 +365,17 @@ function toggleFab() {
   }
 }
 
+function syncThemeColor(theme) {
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', theme === 'dark' ? '#161b22' : '#f6f8fa');
+}
+
 function toggleTheme() {
   const b = document.body;
   const currentTheme = b.getAttribute('data-theme');
   const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
   b.setAttribute('data-theme', nextTheme);
+  syncThemeColor(nextTheme);
   try { localStorage.setItem('nimegun_theme_v175', nextTheme); } catch (e) {}
 }
 
@@ -2014,7 +2020,12 @@ function v175ImportSettings(event) {
 function v175RestoreTheme() {
   try {
     const theme = localStorage.getItem(V175_THEME_KEY);
-    if (theme === 'dark' || theme === 'light') document.body.setAttribute('data-theme', theme);
+    if (theme === 'dark' || theme === 'light') {
+      document.body.setAttribute('data-theme', theme);
+      syncThemeColor(theme);
+    } else {
+      syncThemeColor(document.body.getAttribute('data-theme') || 'light');
+    }
   } catch (e) {}
 }
 
