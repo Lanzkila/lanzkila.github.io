@@ -1,57 +1,89 @@
-# Kirin Landing Page — GitHub Pages v1.1
+# Kirin Landing Page
 
-Static GitHub Pages version. `data.js` kekal **data blok sahaja**; semua renderer dan logic berada dalam `script.js`.
+**Kirin Landing Page** ialah sebuah halaman hub berasaskan **GitHub Pages** yang digunakan untuk menghimpunkan pelbagai projek, blog, tools, radio, safelink dan laman lain dalam satu tempat.
 
-## File utama
+Projek ini asalnya dibina sebagai tema Blogger, kemudian ditukar kepada struktur static GitHub Pages supaya lebih ringan, mudah diselenggara dan tidak lagi bergantung pada sistem template Blogger.
 
-- `index.html` — struktur halaman.
-- `style.css` — CSS.
-- `data.js` — data blok/card sahaja.
-- `script.js` — renderer + logic halaman + tracker `isNew` 24 jam.
-- `backup/Kirin Landing Page.xml` — backup source Blogger asal.
-- `backup/v1.0/` — backup `data.js` dan `script.js` sebelum update v1.1.
+## Tentang Projek
 
-## Edit blok di `data.js`
+Kirin Landing Page direka sebagai pusat navigasi ringkas untuk semua projek Kirin / Lanzkila. Setiap laman dipaparkan dalam bentuk blok atau card yang mengandungi nama, pautan, kategori dan penerangan ringkas.
 
-Format:
+Semua maklumat blok disimpan berasingan di dalam `data.js`, jadi kandungan boleh ditambah, dibuang atau diubah tanpa perlu menyentuh struktur utama halaman.
 
-```js
-{
-  name: "Nama Blok",
-  url: "https://example.com",
-  cat: "cat4",
-  desc: "Penerangan blok.",
-  isPrivate: false,
-  isNew: false
-}
+## Ciri Utama
+
+- Responsive untuk desktop dan telefon.
+- Light Mode dan Dark Mode.
+- Carian projek atau blog.
+- Filter mengikut kategori.
+- Susunan berdasarkan nama, terkini, baru ditambah dan paling lama.
+- Grid View dan List View.
+- Favourite / pin menggunakan Local Storage.
+- Recently Opened.
+- Backup dan Restore tetapan.
+- Badge **New Update** dengan tempoh 24 jam.
+- Kandungan blok dikawal melalui `data.js`.
+- Sesuai digunakan terus dengan GitHub Pages.
+
+## Pengurusan Data
+
+Semua blok utama berada di dalam:
+
+```text
+data.js
 ```
 
-Kategori:
-
-- `cat1` — Personal / Anime
-- `cat2` — Radio / TV
-- `cat3` — Safelink
-- `cat4` — Tools
-
-## Cara `isNew` v1.1 bekerja
-
-`isNew` tidak memerlukan script di dalam `data.js`.
-
-- `isNew: false` — normal, tiada badge. Keadaan ini juga **re-arm** tracker di belakang layar.
-- `isNew: true` — badge **New Update** bermula dan hidup selama 24 jam.
-- Selepas 24 jam — badge hilang sendiri. `script.js` menyimpan keadaan expired dalam `localStorage`, jadi reload page tidak menghidupkannya semula walaupun source masih `true`.
-- Untuk guna semula pada update akan datang: tukar item itu ke `false`, deploy/buka versi itu, kemudian bila ada update baru tukar semula ke `true`.
-
-> Nota: GitHub Pages ialah static site, jadi JavaScript tidak boleh menulis balik `true` menjadi `false` di fail `data.js` pada server. Sebab itu keadaan efektif selepas 24 jam disimpan oleh tracker di browser, sama konsep tracker localStorage pada versi Blogger.
-
-## Metadata lama yang masih disokong
+Contoh:
 
 ```js
-added: "2026-09-04T13:40:00+08:00",
-revision: "2",
-updateType: "CODE"
+const blogData = [
+  {
+    name: "Studio Converter",
+    url: "https://github.com/Lanzkila/StudioConverter",
+    cat: "cat4",
+    desc: "Tempat Converter Manga yang Mendukung Format Seperti CBZ,ZIP dan lain-lain.",
+    isPrivate: false,
+    isNew: false
+  }
+];
 ```
 
-## Deploy GitHub Pages
+`data.js` hanya digunakan untuk menyimpan data. Semua proses render, filter, badge, timer dan fungsi halaman dijalankan oleh `script.js`.
 
-Upload `index.html`, `style.css`, `data.js`, dan `script.js` ke root repository, kemudian aktifkan **Settings → Pages → Deploy from a branch**.
+## Sistem New Update
+
+Tetapkan:
+
+```js
+isNew: true
+```
+
+untuk mengaktifkan badge **New Update**.
+
+Badge akan berjalan selama kira-kira **24 jam** dan kemudian hilang secara automatik. Statusnya disimpan di Local Storage supaya badge yang sudah tamat tidak muncul semula hanya kerana halaman direfresh.
+
+Untuk projek biasa tanpa badge:
+
+```js
+isNew: false
+```
+
+## Struktur Projek
+
+```text
+/
+├── index.html
+├── style.css
+├── script.js
+├── data.js
+└── README.md
+```
+
+## GitHub Pages
+
+Projek ini dibina sebagai laman static, jadi ia boleh terus digunakan melalui GitHub Pages tanpa server atau database tambahan.
+
+---
+
+**Kirin Landing Page**  
+Satu halaman untuk menghimpunkan semua projek dalam satu tempat.
