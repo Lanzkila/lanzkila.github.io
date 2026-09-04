@@ -8,21 +8,12 @@ function renderBlogData() {
 
   grid.innerHTML = '';
 
-  // Bezakan blok duplicate tanpa memerlukan ID tambahan dalam data.js.
-  const occurrenceMap = Object.create(null);
-
-  blogData.forEach(function(item, index) {
+  blogData.forEach(function(item) {
     const card = document.createElement('a');
     card.className = 'blog-card ' + (item.cat || 'cat4') + (item.isPrivate ? ' private' : '');
     card.href = item.url || '#';
     card.target = '_blank';
     card.rel = 'noopener noreferrer';
-
-    const baseKey = String(item.id || ((item.url || '#') + '|' + (item.name || 'Untitled')));
-    occurrenceMap[baseKey] = (occurrenceMap[baseKey] || 0) + 1;
-    card.setAttribute('data-new-key', baseKey + '#' + occurrenceMap[baseKey]);
-    card.setAttribute('data-data-index', String(index));
-    card.setAttribute('data-source-is-new', item.isNew === true ? 'true' : 'false');
 
     if (item.added) card.setAttribute('data-added', item.added);
     if (item.revision !== undefined && item.revision !== null && String(item.revision) !== '') {
@@ -35,7 +26,6 @@ function renderBlogData() {
     const badge = document.createElement('span');
     badge.className = 'badge-new';
     badge.textContent = 'New Update';
-    badge.style.display = 'none';
     badgeContainer.appendChild(badge);
     card.appendChild(badgeContainer);
 
@@ -102,75 +92,6 @@ function writeStore(key, value) {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch (e) {}
-}
-
-/* =========================================================
-   DATA.JS isNew ONE-SHOT TRACKER
-   - isNew:true  -> New Update aktif 24 jam.
-   - Selepas 24 jam, badge hilang sendiri dan kekal expired
-     dalam localStorage walaupun source masih true.
-   - isNew:false -> re-arm state di belakang layar.
-     Bila source ditukar true lagi selepas pernah false,
-     timer 24 jam bermula semula.
-   ========================================================= */
-const DATA_ISNEW_HOURS = 24;
-const DATA_ISNEW_STATE_KEY = 'kirin_data_isnew_state_v1';
-
-function initDataIsNewTracking() {
-  const now = Date.now();
-  const states = readStore(DATA_ISNEW_STATE_KEY, {});
-
-  document.querySelectorAll('.blog-card[data-new-key]').forEach(function(card) {
-    const key = card.getAttribute('data-new-key') || '';
-    if (!key) return;
-
-    const sourceIsNew = card.getAttribute('data-source-is-new') === 'true';
-    const dataIndex = Number(card.getAttribute('data-data-index'));
-    const meta = ensureCardMeta(card);
-    let state = states[key] && typeof states[key] === 'object' ? states[key] : {
-      sourceIsNew: false,
-      startedAt: 0,
-      expired: false
-    };
-
-    if (!sourceIsNew) {
-      // FALSE = armed / standby. Tidak ada badge, tetapi tracker ingat
-      // bahawa TRUE seterusnya ialah kitaran New yang baru.
-      state.sourceIsNew = false;
-      state.startedAt = 0;
-      state.expired = false;
-      card.setAttribute('data-effective-is-new', 'false');
-      if (Number.isInteger(dataIndex) && blogData[dataIndex]) blogData[dataIndex].isNew = false;
-      states[key] = state;
-      return;
-    }
-
-    // TRUE baru selepas FALSE: mula timer 24 jam sekali sahaja.
-    if (!state.sourceIsNew || !Number(state.startedAt)) {
-      state.sourceIsNew = true;
-      state.startedAt = now;
-      state.expired = false;
-    }
-
-    const expiry = Number(state.startedAt) + (DATA_ISNEW_HOURS * 3600000);
-    if (!state.expired && expiry > now) {
-      meta.bNew.style.display = 'inline-block';
-      v17SetBadgeExpiry(meta.bNew, Number(state.startedAt), DATA_ISNEW_HOURS);
-      meta.lastUpdate.setAttribute('data-time', new Date(Number(state.startedAt)).toISOString());
-      card.setAttribute('data-effective-is-new', 'true');
-      if (Number.isInteger(dataIndex) && blogData[dataIndex]) blogData[dataIndex].isNew = true;
-    } else {
-      // Source file tidak diubah secara fizikal, tetapi runtime + localStorage
-      // memperlakukannya sebagai false selepas 24 jam.
-      state.expired = true;
-      card.setAttribute('data-effective-is-new', 'false');
-      if (Number.isInteger(dataIndex) && blogData[dataIndex]) blogData[dataIndex].isNew = false;
-    }
-
-    states[key] = state;
-  });
-
-  writeStore(DATA_ISNEW_STATE_KEY, states);
 }
 
 function simpleHash(str) {
@@ -1293,10 +1214,6 @@ function initBlogTracking() {
   writeStore(BLOG_REVISION_KEY, oldFingerprints);
   writeStore(BLOG_LOCAL_UPDATE_KEY, localUpdates);
   writeStore(V17_CARD_STATE_KEY, cardStates);
-
-  // isNew dari data.js ialah trigger manual 24 jam dan tidak perlu
-  // dicampurkan dengan data.js renderer atau Blogger feed.
-  initDataIsNewTracking();
 }
 
 function v17FinishRefreshOne() {
