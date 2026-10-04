@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8fafc">
+  <title>Lanzkila</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="light">
+<div class="progress-container"><div class="progress-bar" id="myBar"></div></div>
+<div id="notifBubble">🔔 Berjaya Dimuatkan!</div>
+
+<header class="dashboard-header">
+  <div class="dashboard-shell">
+    <div class="dashboard-top">
+      <div class="dashboard-brand">
+        <h1>Nimegun</h1>
+        <span class="admin-welcome" id="greetText">Sistem Dimuatkan...</span>
+      </div>
+
+      <div class="header-actions" aria-label="Tindakan pantas">
+        <button class="header-action" type="button" onclick="toggleTheme()" title="Tukar tema">🌓</button>
+        <button class="header-action" type="button" onclick="randomBlog()" title="Surprise Blog">🎲</button>
+        <button class="header-action" id="refreshFeedBtn" type="button" onclick="v17RefreshFeeds()" title="Semak update sekarang"><span class="refresh-icon">↻</span></button>
+        <button class="header-action header-view-btn" id="viewToggleBtn" type="button" onclick="v17ToggleView()" title="Tukar paparan">☷ List</button>
+        <button class="header-action" type="button" onclick="v175ExportSettings()" title="Backup settings">💾</button>
+        <button class="header-action" type="button" onclick="v175ChooseImport()" title="Restore settings">↥</button>
+      </div>
+    </div>
+
+    <div class="dashboard-stats">
+      <div class="dash-stat"><span class="dash-stat-icon">📁</span><span>Total</span><b id="vCount">0</b></div>
+      <button class="dash-stat dash-stat-button" type="button" onclick="v172OpenNewFilter()" title="Tunjuk semua blog yang masih New">
+        <span class="dash-stat-icon">🔥</span><span>Update</span><b id="oCount">0</b>
+      </button>
+      <div class="dash-stat"><span class="dash-stat-icon">🆕</span><span>Added</span><b id="aCount">0</b></div>
+      <div class="dash-stat dash-status"><span class="dot-net" id="netDot"></span><span id="netText">Online</span></div>
+      <div class="dash-stat dash-battery" title="Bateri peranti">
+        <span>🔋</span><span id="batPercent">--%</span>
+        <span class="battery-meter"><span id="batLevel"></span></span>
+      </div>
+    </div>
+
+    <div class="dashboard-addons">
+      <div class="header-addon">
+        <span class="addon-icon">🕒</span>
+        <span class="addon-copy"><b id="headerClock">--:--:--</b><small id="headerDate">Memuatkan tarikh...</small></span>
+      </div>
+      <button class="header-addon header-addon-btn" id="headerFavAddon" type="button" onclick="v172FilterFavorites()" title="Tunjuk blog Favourite">
+        <span class="addon-icon">★</span>
+        <span class="addon-copy"><b><span id="headerFavCount">0</span> Favourite</b><small>Klik untuk tapis</small></span>
+      </button>
+      <button class="header-addon header-addon-btn" id="headerFeedAddon" type="button" onclick="v17RefreshFeeds()" title="Klik untuk semak feed sekarang">
+        <span class="addon-icon">✓</span>
+        <span class="addon-copy"><b><span id="headerFeedOkCount">0</span>/<span id="headerFeedTotalCount">0</span> Feed OK</b><small id="headerLastSync">Belum semak</small></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<nav class="controls">
+  <input id="searchBar" onkeyup="searchFunction()" placeholder="Cari nama blog..." type="text">
+  <div id="trendingBox" onclick="quickSearch()">Trending: <b id="trendWord">...</b></div>
+  <div class="sort-group">
+  <button class="sort-btn" onclick='sortGrid("name")'>🔠 Nama</button>
+  <button class="sort-btn" onclick='sortGrid("update")'>🔥 Terkini</button>
+</div>
+  <div class="category-menu">
+    <span class="category-title">Kategori Blog</span>
+    <div class="filter-group">
+      <button class="filter-btn active" onclick='filterBlog("all")'><span class="filter-icon">▦</span><span>Semua</span></button>
+      <button class="filter-btn" onclick='filterBlog("cat1")'><span class="filter-icon">✦</span><span>Personal / Anime</span></button>
+      <button class="filter-btn" onclick='filterBlog("cat2")'><span class="filter-icon">▶</span><span>Radio / TV</span></button>
+      <button class="filter-btn" onclick='filterBlog("cat3")'><span class="filter-icon">🔗</span><span>Safelink</span></button>
+      <button class="filter-btn" onclick='filterBlog("cat4")'><span class="filter-icon">⚙</span><span>Tools</span></button>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="grid-container" id="blogGrid">
+    
+    <!-- Block cards are rendered from data.js by script.js --></div>     
+  </div>
+<button class="scroll-top-btn" id="scrollTopBtn" type="button" onclick="scrollToTop()" title="Ke Atas" aria-label="Ke Atas">
+  <span aria-hidden="true">↑</span>
+</button>
+
+  <div class="hub-divider"><span>Tamat Halaman</span></div>
+  
+<footer>
+  <div class="inner-box">
+    © <span id="year"></span> LanzMagick | All Right Reserved. - Created By Kirin
+  </div>
+</footer>
+  
+<div id="customMenu">
+  <div class="menu-opt" onclick="openCurrent()">🌍 Buka Blog</div>
+  <div class="menu-opt" onclick="copyCurrent()">📋 Salin Pautan</div>
+</div>
+  
+<div id="linkLock">
+  <h3>🔒 PAUTAN DIKUNCI</h3>
+  <p style="font-size:11px; color:var(--sub); margin:0;">Sila masukkan kunci akses v13.</p>
+  
+  <input id="lockKey" placeholder="••••••" type="password">
+  
+  <div class="lock-btns">
+    <button id="btnUnlock" type="button">BUKA SEKARANG</button>
+    <button class="btn-cancel" onclick="closeLock()" type="button">BATAL AKSES</button>
+  </div>
+</div>
+  
+
+
+
+<div id="descPopup" class="desc-popup" aria-hidden="true">
+  <div class="desc-popup-arrow"></div>
+  <div class="desc-popup-text" id="descPopupText"></div>
+</div>
+
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
