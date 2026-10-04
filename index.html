@@ -1,125 +1,211 @@
-<!DOCTYPE html>
-<html lang="ms">
+<!doctype html>
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f8fafc">
-  <title>Lanzkila</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b0d12">
+  <meta name="description" content="Lanzkila Projects — Android apps, web tools, backup viewers and open-source experiments.">
+  <meta property="og:title" content="Lanzkila Projects">
+  <meta property="og:description" content="Apps, tools and experiments built and maintained by Lanzkila.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://lanzkila.github.io/">
+  <meta name="twitter:card" content="summary">
+  <title>Lanzkila Projects</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
 </head>
-<body data-theme="light">
-<div class="progress-container"><div class="progress-bar" id="myBar"></div></div>
-<div id="notifBubble">🔔 Berjaya Dimuatkan!</div>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
 
-<header class="dashboard-header">
-  <div class="dashboard-shell">
-    <div class="dashboard-top">
-      <div class="dashboard-brand">
-        <h1>Nimegun</h1>
-        <span class="admin-welcome" id="greetText">Sistem Dimuatkan...</span>
-      </div>
+  <header class="site-header">
+    <div class="shell nav-shell">
+      <a class="brand" href="#top" aria-label="Lanzkila home">
+        <span class="brand-mark" aria-hidden="true">K</span>
+        <span>Lanzkila</span>
+      </a>
 
-      <div class="header-actions" aria-label="Tindakan pantas">
-        <button class="header-action" type="button" onclick="toggleTheme()" title="Tukar tema">🌓</button>
-        <button class="header-action" type="button" onclick="randomBlog()" title="Surprise Blog">🎲</button>
-        <button class="header-action" id="refreshFeedBtn" type="button" onclick="v17RefreshFeeds()" title="Semak update sekarang"><span class="refresh-icon">↻</span></button>
-        <button class="header-action header-view-btn" id="viewToggleBtn" type="button" onclick="v17ToggleView()" title="Tukar paparan">☷ List</button>
-        <button class="header-action" type="button" onclick="v175ExportSettings()" title="Backup settings">💾</button>
-        <button class="header-action" type="button" onclick="v175ChooseImport()" title="Restore settings">↥</button>
-      </div>
-    </div>
+      <nav class="desktop-nav" aria-label="Primary navigation">
+        <a href="#projects">Projects</a>
+        <a href="#about">About</a>
+        <a href="https://github.com/Lanzkila" target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
 
-    <div class="dashboard-stats">
-      <div class="dash-stat"><span class="dash-stat-icon">📁</span><span>Total</span><b id="vCount">0</b></div>
-      <button class="dash-stat dash-stat-button" type="button" onclick="v172OpenNewFilter()" title="Tunjuk semua blog yang masih New">
-        <span class="dash-stat-icon">🔥</span><span>Update</span><b id="oCount">0</b>
-      </button>
-      <div class="dash-stat"><span class="dash-stat-icon">🆕</span><span>Added</span><b id="aCount">0</b></div>
-      <div class="dash-stat dash-status"><span class="dot-net" id="netDot"></span><span id="netText">Online</span></div>
-      <div class="dash-stat dash-battery" title="Bateri peranti">
-        <span>🔋</span><span id="batPercent">--%</span>
-        <span class="battery-meter"><span id="batLevel"></span></span>
+      <div class="nav-actions">
+        <button class="icon-button" id="searchToggle" type="button" aria-label="Search projects" title="Search projects">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m1.35-5.65a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/></svg>
+        </button>
+        <button class="icon-button" id="themeToggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+          <svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v2m0 14v2M3 12h2m14 0h2M5.64 5.64l1.42 1.42m9.88 9.88 1.42 1.42m0-12.72-1.42 1.42M7.06 16.94l-1.42 1.42"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="moon-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.2A8.5 8.5 0 0 1 8.8 3.8 8.5 8.5 0 1 0 20.2 15.2Z"/></svg>
+        </button>
+        <a class="nav-cta" href="#projects">Explore</a>
       </div>
     </div>
 
-    <div class="dashboard-addons">
-      <div class="header-addon">
-        <span class="addon-icon">🕒</span>
-        <span class="addon-copy"><b id="headerClock">--:--:--</b><small id="headerDate">Memuatkan tarikh...</small></span>
+    <div class="search-strip" id="searchStrip" hidden>
+      <div class="shell">
+        <label for="projectSearch">Search projects</label>
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m1.35-5.65a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/></svg>
+          <input id="projectSearch" type="search" autocomplete="off" placeholder="KirinDL, manga, backup viewer...">
+          <kbd>Esc</kbd>
+        </div>
       </div>
-      <button class="header-addon header-addon-btn" id="headerFavAddon" type="button" onclick="v172FilterFavorites()" title="Tunjuk blog Favourite">
-        <span class="addon-icon">★</span>
-        <span class="addon-copy"><b><span id="headerFavCount">0</span> Favourite</b><small>Klik untuk tapis</small></span>
-      </button>
-      <button class="header-addon header-addon-btn" id="headerFeedAddon" type="button" onclick="v17RefreshFeeds()" title="Klik untuk semak feed sekarang">
-        <span class="addon-icon">✓</span>
-        <span class="addon-copy"><b><span id="headerFeedOkCount">0</span>/<span id="headerFeedTotalCount">0</span> Feed OK</b><small id="headerLastSync">Belum semak</small></span>
-      </button>
     </div>
-  </div>
-</header>
+  </header>
 
-<nav class="controls">
-  <input id="searchBar" onkeyup="searchFunction()" placeholder="Cari nama blog..." type="text">
-  <div id="trendingBox" onclick="quickSearch()">Trending: <b id="trendWord">...</b></div>
-  <div class="sort-group">
-  <button class="sort-btn" onclick='sortGrid("name")'>🔠 Nama</button>
-  <button class="sort-btn" onclick='sortGrid("update")'>🔥 Terkini</button>
-</div>
-  <div class="category-menu">
-    <span class="category-title">Kategori Blog</span>
-    <div class="filter-group">
-      <button class="filter-btn active" onclick='filterBlog("all")'><span class="filter-icon">▦</span><span>Semua</span></button>
-      <button class="filter-btn" onclick='filterBlog("cat1")'><span class="filter-icon">✦</span><span>Personal / Anime</span></button>
-      <button class="filter-btn" onclick='filterBlog("cat2")'><span class="filter-icon">▶</span><span>Radio / TV</span></button>
-      <button class="filter-btn" onclick='filterBlog("cat3")'><span class="filter-icon">🔗</span><span>Safelink</span></button>
-      <button class="filter-btn" onclick='filterBlog("cat4")'><span class="filter-icon">⚙</span><span>Tools</span></button>
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="shell hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="pulse"></span> GitHub Pages · Open projects</div>
+          <h1>Apps, tools &amp;<br><span>experiments.</span></h1>
+          <p>A clean home for Lanzkila projects — Android apps, browser tools, backup viewers and utilities built around practical workflows.</p>
+
+          <div class="hero-actions">
+            <a class="button primary" href="#projects">
+              Browse projects
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+            </a>
+            <a class="button secondary" href="https://github.com/Lanzkila" target="_blank" rel="noreferrer">
+              View on GitHub
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h11v11M19 5 5 19"/></svg>
+            </a>
+          </div>
+
+          <div class="hero-meta" aria-label="Site highlights">
+            <span>Static-first</span>
+            <span>Responsive</span>
+            <span>Open source</span>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-label="Featured projects preview">
+          <div class="glow glow-a"></div>
+          <div class="glow glow-b"></div>
+          <div class="preview-window">
+            <div class="preview-topbar">
+              <div class="traffic"><i></i><i></i><i></i></div>
+              <span>lanzkila.github.io</span>
+              <span class="preview-status">LIVE</span>
+            </div>
+            <div class="preview-body">
+              <div class="preview-heading">
+                <div>
+                  <small>FEATURED</small>
+                  <h2>Kirin Suite</h2>
+                </div>
+                <span class="preview-badge">GitHub</span>
+              </div>
+
+              <a class="preview-project" href="https://github.com/Lanzkila/KirinDL" target="_blank" rel="noreferrer">
+                <span class="project-glyph">DL</span>
+                <span><strong>KirinDL</strong><small>Media · Gallery · Batch</small></span>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+              </a>
+              <a class="preview-project" href="https://github.com/Lanzkila/KirinYT" target="_blank" rel="noreferrer">
+                <span class="project-glyph">YT</span>
+                <span><strong>KirinYT</strong><small>Android yt-dlp downloader</small></span>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+              </a>
+              <a class="preview-project" href="https://lanzkila.github.io/Komikku-Viewers/" target="_blank" rel="noreferrer">
+                <span class="project-glyph">KV</span>
+                <span><strong>Kirin Backup Viewer</strong><small>Komikku &amp; Mihon backups</small></span>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+              </a>
+
+              <div class="preview-footer">
+                <span><i></i> GitHub Pages ready</span>
+                <span>Client-side first</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="projects section" id="projects">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <span class="section-kicker">Projects</span>
+            <h2>Built for real use.</h2>
+            <p>Public projects currently available from Lanzkila.</p>
+          </div>
+          <div class="filter-tabs" id="filterTabs" aria-label="Project categories"></div>
+        </div>
+
+        <div class="project-grid" id="projectGrid" aria-live="polite"></div>
+        <p class="empty-state" id="emptyState" hidden>No projects match your search.</p>
+      </div>
+    </section>
+
+    <section class="about section" id="about">
+      <div class="shell">
+        <div class="section-head compact">
+          <div>
+            <span class="section-kicker">Why this site</span>
+            <h2>A proper GitHub Pages home.</h2>
+          </div>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-card">
+            <span class="feature-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m13 2-9 12h7l-1 8 10-13h-7V2Z"/></svg>
+            </span>
+            <h3>Fast by default</h3>
+            <p>Plain HTML, CSS and JavaScript. No framework bundle, no dashboard overhead, and no backend required.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 7v5c0 5 3.4 8 8 9 4.6-1 8-4 8-9V7l-8-4Z"/><path d="m9 12 2 2 4-4"/></svg>
+            </span>
+            <h3>Privacy-aware tools</h3>
+            <p>Several web utilities are designed to process local files in the browser instead of sending them to a custom server.</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 9 4 12l4 3m8-6 4 3-4 3M14 5l-4 14"/></svg>
+            </span>
+            <h3>Project-first</h3>
+            <p>The page is a launcher for real repositories, releases and live tools rather than a generic blog dashboard.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <div class="shell">
+        <div class="cta-card">
+          <div>
+            <span class="section-kicker">Source</span>
+            <h2>Follow development on GitHub.</h2>
+            <p>Browse repositories, releases, source history and future experiments from the Lanzkila profile.</p>
+          </div>
+          <a class="button primary" href="https://github.com/Lanzkila" target="_blank" rel="noreferrer">
+            Open GitHub
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h11v11M19 5 5 19"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-inner">
+      <a class="brand footer-brand" href="#top">
+        <span class="brand-mark" aria-hidden="true">K</span>
+        <span>Lanzkila</span>
+      </a>
+      <p>Apps, tools and experiments on GitHub Pages.</p>
+      <div class="footer-links">
+        <a href="#projects">Projects</a>
+        <a href="https://github.com/Lanzkila" target="_blank" rel="noreferrer">GitHub</a>
+        <span>© <span id="year"></span> Lanzkila</span>
+      </div>
     </div>
-  </div>
-</nav>
-
-<div class="container">
-  <div class="grid-container" id="blogGrid">
-    
-    <!-- Block cards are rendered from data.js by script.js --></div>     
-  </div>
-<button class="scroll-top-btn" id="scrollTopBtn" type="button" onclick="scrollToTop()" title="Ke Atas" aria-label="Ke Atas">
-  <span aria-hidden="true">↑</span>
-</button>
-
-  <div class="hub-divider"><span>Tamat Halaman</span></div>
-  
-<footer>
-  <div class="inner-box">
-    © <span id="year"></span> LanzMagick | All Right Reserved. - Created By Kirin
-  </div>
-</footer>
-  
-<div id="customMenu">
-  <div class="menu-opt" onclick="openCurrent()">🌍 Buka Blog</div>
-  <div class="menu-opt" onclick="copyCurrent()">📋 Salin Pautan</div>
-</div>
-  
-<div id="linkLock">
-  <h3>🔒 PAUTAN DIKUNCI</h3>
-  <p style="font-size:11px; color:var(--sub); margin:0;">Sila masukkan kunci akses v13.</p>
-  
-  <input id="lockKey" placeholder="••••••" type="password">
-  
-  <div class="lock-btns">
-    <button id="btnUnlock" type="button">BUKA SEKARANG</button>
-    <button class="btn-cancel" onclick="closeLock()" type="button">BATAL AKSES</button>
-  </div>
-</div>
-  
-
-
-
-<div id="descPopup" class="desc-popup" aria-hidden="true">
-  <div class="desc-popup-arrow"></div>
-  <div class="desc-popup-text" id="descPopupText"></div>
-</div>
-
+  </footer>
 
   <script src="data.js"></script>
   <script src="script.js"></script>
