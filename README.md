@@ -1,74 +1,14 @@
-# Kirin Landing Page
+# Lanzkila Projects
 
-**Kirin Landing Page** ialah sebuah halaman hub berasaskan **GitHub Pages** yang digunakan untuk menghimpunkan pelbagai projek, blog, tools, radio, safelink dan laman lain dalam satu tempat.
+Official GitHub Pages home for public Lanzkila projects.
 
-Projek ini asalnya dibina sebagai tema Blogger, kemudian ditukar kepada struktur static GitHub Pages supaya lebih ringan, mudah diselenggara dan tidak lagi bergantung pada sistem template Blogger.
+**Live site:** https://lanzkila.github.io/
 
-## Tentang Projek
+## Purpose
 
-Kirin Landing Page direka sebagai pusat navigasi ringkas untuk semua projek Kirin / Lanzkila. Setiap laman dipaparkan dalam bentuk blok atau card yang mengandungi nama, pautan, kategori dan penerangan ringkas.
+This repository is a lightweight project website inspired by modern open-source app landing pages. It provides a single public home for Android apps, web tools, backup viewers and utilities maintained under the Lanzkila GitHub account.
 
-Semua maklumat blok disimpan berasingan di dalam `data.js`, jadi kandungan boleh ditambah, dibuang atau diubah tanpa perlu menyentuh struktur utama halaman.
-
-## Ciri Utama
-
-- Responsive untuk desktop dan telefon.
-- Light Mode dan Dark Mode.
-- Carian projek atau blog.
-- Filter mengikut kategori.
-- Susunan berdasarkan nama, terkini, baru ditambah dan paling lama.
-- Grid View dan List View.
-- Favourite / pin menggunakan Local Storage.
-- Recently Opened.
-- Backup dan Restore tetapan.
-- Badge **New Update** dengan tempoh 24 jam.
-- Kandungan blok dikawal melalui `data.js`.
-- Sesuai digunakan terus dengan GitHub Pages.
-
-## Pengurusan Data
-
-Semua blok utama berada di dalam:
-
-```text
-data.js
-```
-
-Contoh:
-
-```js
-const blogData = [
-  {
-    name: "Studio Converter",
-    url: "https://github.com/Lanzkila/StudioConverter",
-    cat: "cat4",
-    desc: "Tempat Converter Manga yang Mendukung Format Seperti CBZ,ZIP dan lain-lain.",
-    isPrivate: false,
-    isNew: false
-  }
-];
-```
-
-`data.js` hanya digunakan untuk menyimpan data. Semua proses render, filter, badge, timer dan fungsi halaman dijalankan oleh `script.js`.
-
-## Sistem New Update
-
-Tetapkan:
-
-```js
-isNew: true
-```
-
-untuk mengaktifkan badge **New Update**.
-
-Badge akan berjalan selama kira-kira **24 jam** dan kemudian hilang secara automatik. Statusnya disimpan di Local Storage supaya badge yang sudah tamat tidak muncul semula hanya kerana halaman direfresh.
-
-Untuk projek biasa tanpa badge:
-
-```js
-isNew: false
-```
-
-## Struktur Projek
+## Current structure
 
 ```text
 /
@@ -76,14 +16,42 @@ isNew: false
 ├── style.css
 ├── script.js
 ├── data.js
-└── README.md
+├── 404.html
+├── favicon.svg
+├── robots.txt
+├── .nojekyll
+└── backup/
 ```
 
-## GitHub Pages
+Project cards are maintained in `data.js`. The page itself uses plain HTML, CSS and JavaScript so it can run directly on GitHub Pages without a framework or build step.
 
-Projek ini dibina sebagai laman static, jadi ia boleh terus digunakan melalui GitHub Pages tanpa server atau database tambahan.
+## Featured public projects
+
+- KirinDL
+- KirinYT
+- Kirin Backup Viewer
+- Kirin Anikku Backup Viewer
+- Manga Studio
+- Modding Editor Pro
+- Kirin Manga Reader
+- Kirin PDF Reader
+
+## Design goals
+
+- GitHub Pages first
+- Responsive desktop and mobile layout
+- Light and dark themes
+- Fast static delivery
+- Search and project category filters
+- Direct links to live apps, releases and source repositories
+- No backend required
+
+## Previous website
+
+The previous dashboard-style landing page is preserved under:
+
+`backup/pre-project-site-2026-10-05/`
 
 ---
 
-**Kirin Landing Page**  
-Satu halaman untuk menghimpunkan semua projek dalam satu tempat.
+© Lanzkila
