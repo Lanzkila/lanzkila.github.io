@@ -464,16 +464,13 @@ body {
   }
 
   .filter-tabs {
-    width: calc(100% + 24px);
-    margin-left: -12px;
-    padding: 0 12px 4px;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    gap: 6px;
-    scrollbar-width: none;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x proximity;
+    width: 100%;
+    margin-left: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+    overflow: visible;
   }
 
   .filter-tabs::-webkit-scrollbar {
@@ -481,11 +478,14 @@ body {
   }
 
   .filter-tab {
-    flex: 0 0 auto;
-    scroll-snap-align: start;
+    width: 100%;
+    min-width: 0;
+    min-height: 40px;
+    padding: 8px 7px;
     white-space: nowrap;
-    min-height: 38px;
-    padding: 7px 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
     border-color: var(--line);
     background: color-mix(in srgb, var(--surface) 70%, transparent);
   }
